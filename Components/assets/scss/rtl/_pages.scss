@@ -1,0 +1,185 @@
+// _pages.scss
+
+.selling-product {
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        left: 0px !important;
+        right: auto !important;
+    }
+
+    .swiper-button-prev {
+        left: 35px !important;
+        right: auto !important;
+    }
+
+}
+
+.animation-effect-6 {
+    left: 4%;
+    right: auto;
+
+    &.left {
+        right: 4%;
+        left: auto;
+    }
+}
+
+.animation-effect-3 {
+    right: 35%;
+    left: auto;
+
+    &.left {
+        right: 35%;
+        left: auto;
+    }
+}
+
+.animation-effect-4 {
+    right: auto;
+    left: 30%;
+
+    &.left {
+        right: 30%;
+        left: auto;
+    }
+}
+
+
+.layout-rightside {
+    margin-left: calc(0px - #{$grid-gutter-width} * 1.2);
+    margin-right: auto;
+}
+
+.layout-rightside-col {
+
+    @media (max-width: 1699.98px) {
+        left: 0px;
+        right: auto;
+
+        .layout-rightside {
+            margin-right: auto;
+            margin-left: calc(0px - #{$grid-gutter-width} * 0.5);
+        }
+    }
+}
+
+.btn-icon.layout-rightside-btn {
+
+    @media (max-width: 1699.98px) {
+        left: 80px;
+        right: auto;
+    }
+}
+
+[data-layout="horizontal"],
+[data-layout-style=detached] {
+    @media (min-width: 1700px) {
+        .layout-rightside {
+            margin-left: 0;
+            margin-right: auto;
+        }
+    }
+}
+
+#back-to-top {
+    left: 28px; 
+    right: auto; 
+}
+
+// ribbons
+
+
+.ribbon-box{
+    .ribbon{
+        left: auto;
+        right: -1px;
+        &.round-shape{
+            border-radius: 30px 0 0 30px;
+        }
+    }
+
+    &.right {
+        .ribbon{
+            right: auto;
+            left: -1px;
+            &.round-shape{
+                border-radius: 0 30px 30px 0;
+            }
+        }
+    }
+}
+
+.ribbon-box{
+    .ribbon{
+        &.ribbon-shape{
+            &:before{
+                left: auto;
+                right: -6.5px;
+            }
+
+            &:after{
+                left: auto;
+                right: -4.5px;
+            }
+
+            &:before, &:after{
+                border-radius: 0 5px 5px 0;
+            }
+        }
+    }
+
+    
+
+    &.ribbon-fill {
+        .ribbon{
+            transform: rotate(45deg);
+            left: auto;
+            right: -36px;
+        }
+
+        
+    }
+
+    .trending-ribbon{
+        transform: translateX(50px);
+    }
+
+    &.right {
+        .ribbon{
+            &.ribbon-shape{
+                &:before{
+                    left: -6.5px;
+                    right: auto;
+                    border-radius: 5px 0 0 5px;
+                }
+
+                &:after{
+                    left: -4.5px;
+                    right: auto;
+                    border-radius: 0 5px 5px 0;
+                }
+            }
+        }
+
+       &.ribbon-fill .ribbon{
+            transform: rotate(-45deg);
+            left: -38px;
+            right: auto;
+        }
+
+        .trending-ribbon{
+            transform: translateX(-50px);
+        }
+    }
+}
+
+
+// demos
+
+.icon-demo-content{
+    i, svg{
+        margin-right: 0;
+        margin-left: 10px;
+    }
+}
