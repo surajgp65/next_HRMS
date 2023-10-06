@@ -115,7 +115,7 @@ const newPage = () => {
                             </Col>
                             
                             <Col md={6}>
-                            <Form.Label htmlFor="isGroup" className="form-label">Payroll Cost Center</Form.Label>
+                            <Form.Label htmlFor="isGroup" className="form-label">Leave Block List</Form.Label>
                                 <Select options={options} />
                             </Col>
                             
