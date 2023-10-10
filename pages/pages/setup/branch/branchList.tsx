@@ -93,52 +93,33 @@ const newPage = () => {
                                     <table className="table table-borderless align-middle mb-0">
                                         <thead className="table-active">
                                             <tr>
-                                                <th scope="col">Email<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                                <th scope="col">Price<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                                <th scope="col">Tag<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
+                                                <th scope="col">ID<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
+                                                <th scope="col">Branch<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>jordan.martino@hybrix.com</td>
-                                                <td>$1.95</td>
-                                                <td><Link href="#" scroll={false} className="badge text-success bg-success-subtle">Paid</Link></td>
+                                                <td>Salt-Tech Software Services LLP</td>
+                                                <td>India</td>
                                             </tr>
                                             <tr>
-                                                <td>nancy.martino@hybrix.com</td>
-                                                <td>$5.00</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-warning">Pending</Link></td>
+                                                <td>Salt-Tech Software Services LLP</td>
+                                                <td>India</td>
                                             </tr>
                                             <tr>
-                                                <td>pieter.novitsky@hybrix.com</td>
-                                                <td>$2.05</td>
-                                                <td><Link href="#" scroll={false} className="badge text-success bg-success-subtle">Paid</Link></td>
+                                                <td>Salt-Tech Software Services LLP</td>
+                                                <td>India</td>
+                                                <td></td>
                                             </tr>
                                             <tr>
-                                                <td>Ashley@hybrix.com</td>
-                                                <td>$69.99</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-danger">Cancelled</Link></td>
+                                                <td>Salt-Tech Software Services LLP</td>
+                                                <td>India</td>
                                             </tr>
                                             <tr>
-                                                <td>Heather@hybrix.com</td>
-                                                <td>$16.78</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-danger">Cancelled</Link></td>
+                                                <td>Salt-Tech Software Services LLP</td>
+                                                <td>India</td>
                                             </tr>
-                                            <tr>
-                                                <td>Jimenez@hybrix.com</td>
-                                                <td>$79.99</td>
-                                                <td><Link href="#" scroll={false} className="badge text-success bg-success-subtle">Paid</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Daniel@hybrix.com</td>
-                                                <td>$87.00</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-warning">Pending</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Scott@hybrix.com</td>
-                                                <td>$42.32</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-danger">Cancelled</Link></td>
-                                            </tr>
+                                            
                                         </tbody>
                                     </table>
                                 </div>

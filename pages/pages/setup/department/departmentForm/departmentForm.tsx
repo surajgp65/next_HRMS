@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import React, { ReactElement, useState, useMemo } from 'react';
 import Head from 'next/head';
 import { Container, Row, Col, Form, Button, InputGroup, Dropdown } from 'react-bootstrap';
 import Breadcrumb from '@common/Breadcrumb';
@@ -9,13 +9,22 @@ import Select from 'react-select';
 
 
 
+
 const newPage = () => {
     const router = useRouter();
 
+
+
     const options = [
-        { value: 'chocolate', label: 'Chocolate' },
-        { value: 'strawberry', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' }
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option 2', label: 'Option 2' },
+        { value: 'CreateNewCostCenter', label: 'Create a new Cost Center' }
+      ]
+
+      const options2 = [
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option 2', label: 'Option 2' },
+        { value: 'CreateNewCostCenter', label: 'Create a new Cost Center' }
       ]
 
     const [validated, setValidated] = useState(false);
@@ -32,12 +41,19 @@ const newPage = () => {
         setValidated(true);
     };
 
+    
+
 
     // Change in the Option
     const handleSelectChange = (selectedOption: any) => {
         // Log the clicked option's value
         console.log('Clicked option:', selectedOption?.value);
         setSelectedOption(selectedOption);
+
+        // Check if the selected option is "Strawberry"
+        if (selectedOption?.value === 'CreateNewCostCenter') {
+            router.push("/pages/setup/company/companyForm/newHoliday");
+        }
     };
 
     return (
@@ -108,15 +124,18 @@ const newPage = () => {
 
                             <Col md={6}>
                             <Form.Label htmlFor="isGroup" className="form-label">Payroll Cost Center</Form.Label>
-                                <Select 
-                                    options={options} 
+                                <Select
+                                    options={options}
                                     onChange={handleSelectChange}
                                 />
                             </Col>
                             
                             <Col md={6}>
                             <Form.Label htmlFor="isGroup" className="form-label">Leave Block List</Form.Label>
-                                <Select options={options} />
+                                <Select
+                                    options={options2}
+                                    onChange={handleSelectChange}
+                                />
                             </Col>
                             
                         </Row>

@@ -30,10 +30,10 @@ const newPage = () => {
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
-                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Branch List" />
+                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Designation List" />
                     <div className="text-end m-2">
                         <Button variant="primary" onClick={() => tog_grid()}>
-                            Add Branch
+                            Add Designation
                         </Button>
                     </div>
                     {/* <Button variant="primary" onClick={() => tog_grid()}>
@@ -53,8 +53,8 @@ const newPage = () => {
                                 <div className="row g-3">
                                     <Col xxl={6}>
                                         <div>
-                                            <Form.Label htmlFor="lastName" className="form-label">Branch name</Form.Label>
-                                            <Form.Control type="text" className="form-control" id="branchInput" placeholder="Enter Branch Name" />
+                                            <Form.Label htmlFor="lastName" className="form-label">Designation </Form.Label>
+                                            <Form.Control type="text" className="form-control" id="branchInput" placeholder="Enter Designation" />
                                         </div>
                                     </Col>
                                     <Col lg={12}>

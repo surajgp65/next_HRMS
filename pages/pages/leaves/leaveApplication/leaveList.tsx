@@ -20,11 +20,11 @@ const newPage = () => {
     return (
         <React.Fragment>
             <Head>
-                <title>newPage | Hybrix - Admin & Dashboard Template</title>
+                <title>Leave List | Hybrix - Admin & Dashboard Template</title>
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
-                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Company List" />
+                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Leave List" />
                     <div className="text-end m-2">
                         <Button type="submit" variant="primary" onClick={handleAddButtonClick}>Add Leave Application</Button>
                     </div>

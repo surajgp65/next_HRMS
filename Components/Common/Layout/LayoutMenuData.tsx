@@ -14,9 +14,12 @@ const Navdata = () => {
 
     // Setup
     const [isSetup, setIsSetup] = useState(false);
-
     // Company
     const [isCompany, setIsCompany] = useState(false);
+
+
+
+
     // Branch
     const [isBranch, setIsBranch] = useState(false);
     // Department
@@ -25,13 +28,18 @@ const Navdata = () => {
     const [isDesignation, setIsDesignation] = useState(false);
 
 
+    // Leaves
+    const [isLeaves, setIsLeaves] = useState(false);
+    const [isLeavesApp, setIsLeavesApp] = useState(false);
+    const [isCompLeaveReq, setIsCompLeaveReq] = useState(false);
 
     // Employee
     const [isEmployee, setIsEmployee] = useState(false);
+    const [isSubEmployee, setIsSubEmployee] = useState(false);
+    const [isEmployeeGroup, setIsEmployeeGroup] = useState(false);
+    const [isEmployeeGrade, setIsEmployeeGrade] = useState(false);
 
 
-    // Leaves
-    const [isLeaves, setIsLeaves] = useState(false);
     
     // Attendance
     const [isAttendance, setIsAttendance] = useState(false);
@@ -41,8 +49,7 @@ const Navdata = () => {
     const [isProfile, setIsProfile] = useState(false);
 
     // Multi Level
-    const [isLevel1, setIsLevel1] = useState(false);
-    const [isLevel2, setIsLevel2] = useState(false);
+
 
     const [isCurrentState, setIsCurrentState] = useState('');
 
@@ -67,6 +74,9 @@ const Navdata = () => {
         document.body.classList.remove('twocolumn-panel');
         if (isCurrentState !== 'Auth') {
             setIsAuth(false);
+        }
+        if (isCurrentState !== 'Setup') {
+            setIsSetup(false);
         }
         if (isCurrentState !== 'Pages') {
             setIsPages(false);
@@ -114,6 +124,7 @@ const Navdata = () => {
     }, [
         isCurrentState,
         isAuth,
+        isSetup,
         isPages,
         isLeaves,
         isEmployee,
@@ -147,11 +158,11 @@ const Navdata = () => {
             link: "/#",
             click: function (e: any) {
                 e.preventDefault();
-                setIsAuth(!isAuth);
-                setIsCurrentState('Auth');
+                setIsSetup(!isSetup);
+                setIsCurrentState('Setup');
                 updateIconSidebar(e);
             },
-            stateVariables: isAuth,
+            stateVariables: isSetup,
             subItems: [
                 {
                     id: "company",
@@ -159,10 +170,10 @@ const Navdata = () => {
                     link: "/pages/setup/company/companyList",
                     click: function (e: any) {
                         e.preventDefault();
-                        setIsSignIn(!isSignIn);
+                        setIsCompany(!isCompany);
                     },
                     parentId: "setup",
-                    stateVariables: isSignIn,
+                    stateVariables: isCompany,
                 },
                 {
                     id: "branch",
@@ -170,10 +181,10 @@ const Navdata = () => {
                     link: "/pages/setup/branch/branchList",
                     click: function (e: any) {
                         e.preventDefault();
-                        setIsSignUp(!isSignUp);
+                        setIsBranch(!isBranch);
                     },
                     parentId: "setup",
-                    stateVariables: isSignUp,
+                    stateVariables: isBranch,
                 },
                 {
                     id: "department",
@@ -181,10 +192,10 @@ const Navdata = () => {
                     link: "/pages/setup/department/departmentList",
                     click: function (e: any) {
                         e.preventDefault();
-                        setIsPasswordReset(!isPasswordReset);
+                        setIsDepartment(!isDepartment);
                     },
                     parentId: "setup",
-                    stateVariables: isPasswordReset,
+                    stateVariables: isDepartment,
                 },
                 {
                     id: "designation",
@@ -192,10 +203,10 @@ const Navdata = () => {
                     link: "/pages/setup/designation/designationList",
                     click: function (e: any) {
                         e.preventDefault();
-                        setIsPasswordReset(!isPasswordReset);
+                        setIsDesignation(!isDesignation);
                     },
                     parentId: "setup",
-                    stateVariables: isPasswordReset,
+                    stateVariables: isDesignation,
                 },
             ],
         },
@@ -216,15 +227,23 @@ const Navdata = () => {
                     id: "leaveApplication",
                     label: "Leave Application",
                     link: "/pages/leaves/leaveApplication/leaveList",
-                    parentId: "pages",
+                    click: function (e: any) {
+                        e.preventDefault();
+                        setIsLeavesApp(!isLeavesApp);
+                    },
+                    parentId: "leaves",
+                    stateVariables: isLeavesApp,
                 },
                 {
-                    id: "employeeGroup",
+                    id: "compLeaveReq",
                     label: "Compensatory Leave Request",
                     link: "/#",
                     click: function (e: any) {
                         e.preventDefault();
+                        setIsCompLeaveReq(!isCompLeaveReq);
                     },
+                    parentId: "leaves",
+                    stateVariables: isCompLeaveReq,
                 },
             ],
         },
@@ -244,8 +263,13 @@ const Navdata = () => {
                 {
                     id: "employee",
                     label: "Employee",
-                    link: "#",
-                    parentId: "pages",
+                    link: "/pages/employee/employee/employeeList",
+                    click: function (e: any) {
+                        e.preventDefault();
+                        setIsSubEmployee(!isSubEmployee);
+                    },
+                    parentId: "employee",
+                    stateVariables: isSubEmployee,
                 },
                 {
                     id: "employeeGroup",
@@ -253,7 +277,10 @@ const Navdata = () => {
                     link: "/#",
                     click: function (e: any) {
                         e.preventDefault();
+                        setIsEmployeeGroup(!isEmployeeGroup);
                     },
+                    parentId: "employee",
+                    stateVariables: isEmployeeGroup,
                 },
                 {
                     id: "employeeGrade",
@@ -261,8 +288,10 @@ const Navdata = () => {
                     link: "/#",
                     click: function (e: any) {
                         e.preventDefault();
-
+                        setIsEmployeeGrade(!isEmployeeGrade);
                     },
+                    parentId: "employee",
+                    stateVariables: isEmployeeGrade,
                 },
             ],
         },
@@ -282,7 +311,7 @@ const Navdata = () => {
                 {
                     id: "attendance",
                     label: "Attendance",
-                    link: "#",
+                    link: "/pages/attendance/attendance/attendanceList",
                     parentId: "pages",
                 },
                 {
