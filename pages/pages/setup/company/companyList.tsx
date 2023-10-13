@@ -1,10 +1,10 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState, useMemo } from 'react';
 import Head from 'next/head';
-import { Container } from 'react-bootstrap';
 import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
-import { Card, Dropdown, Col, Button } from 'react-bootstrap';
-import Link from 'next/link';
+import { Card, Col, Button, Row, Container } from 'react-bootstrap';
+import TableContainer from '@common/TableContainer';
+
 
 
 
@@ -24,96 +24,125 @@ const newPage = () => {
       };
 
 
+      const staticData = [
+        {
+            id: "Salt-Tech Software Services LLP",
+            country: "India",
+            createDate: "2023-10-09",
+            parentCompany: "Parent Company"
+        },
+        {
+            id: "Salt-Tech Software Services LLP",
+            country: "India",
+            createDate: "2023-10-09",
+            parentCompany: ""
+        },
+        {
+            id: "Salt-Tech Software Services LLP",
+            country: "India",
+            createDate: "2023-10-09",
+            parentCompany: "Parent Company"
+        },
+        {
+            id: "Salt-Tech Software Services LLP",
+            country: "India",
+            createDate: "2023-10-09",
+            parentCompany: ""
+        },
+
+        // Add more objects as needed
+    ];
+
+
+    const columns = useMemo(
+        () => [
+            {
+                id: "#",
+                Header: "#",
+                disableFilters: true,
+                filterable: false,
+                accessor: (cellProps: any) => {
+                    return (
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" name="chk_child" value="option1" />
+                        </div>)
+                },
+            },
+            {
+                Header: "ID",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return (cellProps.id)
+                },
+            },
+            {
+                Header: "Country",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return cellProps.country;
+                },
+            },
+            {
+                Header: "Parent Company",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return cellProps.parentCompany;
+                },
+            },
+        ],
+        []
+      );
+
+
     return (
         <React.Fragment>
             <Head>
-                <title>newPage | Hybrix - Admin & Dashboard Template</title>
+                <title>Company List</title>
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
                     <Breadcrumb breadcrumb="Pages" breadcrumbItem="Company List" />
                     <div className="text-end m-2">
-                        <Button type="submit" variant="primary" onClick={handleAddButtonClick}>Add Company</Button>
+                        <Button type="submit" className="btn-sm mx-4" variant="primary" onClick={handleAddButtonClick}><i className="ri-add-line align-bottom me-1"></i>Add Company</Button>
                     </div>
 
-                    {/* Table */}
-                    <Col xxl={4}>
-                        <Card className="card-height-100">
-                            <Card.Header className="d-flex">
-                                <h5 className="card-title flex-grow-1 mb-0">List</h5>
-                                <div className="flex-shrink-0">
-                                    <Dropdown drop="start">
-                                        <Dropdown.Toggle as="a" className="arrow-none">
-                                            <i className="ri-more-2-fill fs-14"></i>
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu as="ul" className="dropdown-menu-end">
-                                            <li> <Dropdown.Item href="#">View</Dropdown.Item> </li>
-                                            <li> <Dropdown.Item href="#">Edit</Dropdown.Item> </li>
-                                            <li> <Dropdown.Item href="#">Delete</Dropdown.Item> </li>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </div>
-                            </Card.Header>
-                            <Card.Body>
-                                <div className="table-responsive table-card">
-                                    <table className="table table-borderless align-middle mb-0">
-                                        <thead className="table-active">
-                                            <tr>
-                                                <th scope="col">Id<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                                <th scope="col">Country<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                                <th scope="col">Parent Company<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Salt-Tech Software Services LLP</td>
-                                                <td>India</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Salt-Tech Software Services LLP</td>
-                                                <td>India</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Salt-Tech Software Services LLP</td>
-                                                <td>India</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Salt-Tech Software Services LLP</td>
-                                                <td>India</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Salt-Tech Software Services LLP</td>
-                                                <td>India</td>
-                                                <td></td>
-                                            </tr>
+                    {/* ______________________Table_____________________ */}
+                    <Row>
+                            <Col lg={12}>
+                                <Card id="apiKeyList">
+                                    <Card.Header className="d-flex align-items-center">
+                                        <h5 className="card-title flex-grow-1 mb-0">Company List</h5>
+                                        
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <TableContainer
+                                            columns={(columns || [])}
+                                            data={(staticData || [])}
+                                            isPagination={true}
+                                            isGlobalFilter={true}
+                                            iscustomPageSize={false}
+                                            isBordered={false}
+                                            customPageSize={5}
+                                            className="custom-header-css table align-middle table-nowrap"
+                                            tableClassName="table-centered align-middle table-nowrap mb-0"
+                                            theadClassName="text-muted table-light"
+                                            SearchPlaceholder='Search Company...'
                                             
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <ul className="pagination pagination-separated mb-0 mt-4 pt-1 justify-content-end">
-                                    <li className="page-item disabled">
-                                        <Link href="#" scroll={false} className="page-link">Previous</Link>
-                                    </li>
-                                    <li className="page-item active">
-                                        <Link href="#" scroll={false} className="page-link">1</Link>
-                                    </li>
-                                    <li className="page-item ">
-                                        <Link href="#" scroll={false} className="page-link">2</Link>
-                                    </li>
-                                    <li className="page-item">
-                                        <Link href="#" scroll={false} className="page-link">3</Link>
-                                    </li>
-                                    <li className="page-item">
-                                        <Link href="#" scroll={false} className="page-link">Next</Link>
-                                    </li>
-                                </ul>
-                            </Card.Body>
-                        </Card>
-                    </Col>
+                                        />
+                                        <div className="noresult" style={{ display: "none" }}>
+                                            <div className="text-center">
+                                                {/* <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon> */}
+                                                <h5 className="mt-2">Sorry! No Result Found</h5>
+                                                <p className="text-muted mb-0">We've searched more than 150+ API Keys We did not find any API for you search.</p>
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
 
                 </Container>
             </div>

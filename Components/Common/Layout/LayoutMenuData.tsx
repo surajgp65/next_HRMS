@@ -237,7 +237,7 @@ const Navdata = () => {
                 {
                     id: "compLeaveReq",
                     label: "Compensatory Leave Request",
-                    link: "/#",
+                    link: "/pages/leaves/compensatoryLeaveApp/compensatoryLeaveList",
                     click: function (e: any) {
                         e.preventDefault();
                         setIsCompLeaveReq(!isCompLeaveReq);
@@ -263,7 +263,7 @@ const Navdata = () => {
                 {
                     id: "employee",
                     label: "Employee",
-                    link: "/pages/employee/employee/employeeList",
+                    link: "/pages/employee/employeeDetails/employeeList",
                     click: function (e: any) {
                         e.preventDefault();
                         setIsSubEmployee(!isSubEmployee);
@@ -274,7 +274,7 @@ const Navdata = () => {
                 {
                     id: "employeeGroup",
                     label: "Employee Group",
-                    link: "/#",
+                    link: "/pages/employee/employeeGroup/employeeGroupList",
                     click: function (e: any) {
                         e.preventDefault();
                         setIsEmployeeGroup(!isEmployeeGroup);
@@ -285,7 +285,7 @@ const Navdata = () => {
                 {
                     id: "employeeGrade",
                     label: "Employee Grade",
-                    link: "/#",
+                    link: "/pages/employee/employeeGrade/employeeGradeList",
                     click: function (e: any) {
                         e.preventDefault();
                         setIsEmployeeGrade(!isEmployeeGrade);
@@ -317,7 +317,7 @@ const Navdata = () => {
                 {
                     id: "attendanceReq",
                     label: "Attendance Request",
-                    link: "/#",
+                    link: "/pages/attendance/attendanceRequest/attendanceRequestList",
                     click: function (e: any) {
                         e.preventDefault();
                     },
@@ -325,7 +325,7 @@ const Navdata = () => {
                 {
                     id: "employeeCheckIn",
                     label: "Employee Check In",
-                    link: "/#",
+                    link: "/pages/attendance/employeeCheckIn/employeeCheckInList",
                     click: function (e: any) {
                         e.preventDefault();
 

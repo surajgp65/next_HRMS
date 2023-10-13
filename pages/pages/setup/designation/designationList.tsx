@@ -1,11 +1,11 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useState, useMemo } from 'react';
 import Head from 'next/head';
-import { Container } from 'react-bootstrap';
 import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Card, Col, Dropdown, Button, Modal, Form } from 'react-bootstrap';
+import { Card, Col, Row, Button, Modal, Form, Container } from 'react-bootstrap';
+import TableContainer from '@common/TableContainer';
 
 
 
@@ -18,22 +18,94 @@ const newPage = () => {
         setmodal_grid(!modal_grid);
     }
 
-    const handleAddButtonClick = () => {
-        router.push('/pages/setup/branch/branchForm/branchForm');
-    };
+
+    // Data for the Table 
+    const staticData = [
+        {
+            id: 1,
+            designation: "Sales Manager"
+        },
+        {
+            id: 2,
+            designation: "Senior Business Development"
+        },
+        {
+            id: 3,
+            designation: "Head Vertical"
+        },
+        {
+            id: 4,
+            designation: "Telesales Executive"
+        },
+        {
+            id: 5,
+            designation: "Telesales Executive"
+        },
+        {
+            id: 6,
+            designation: "Tele Marketing"
+        },
+        {
+            id: 7,
+            designation: "Vice President"
+        },
+
+        // Add more objects as needed
+    ];
+
+    const columns = useMemo(
+        () => [
+            {
+                id: "#",
+                Header: "#",
+                disableFilters: true,
+                filterable: false,
+                accessor: (cellProps: any) => {
+                    return (
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" name="chk_child" value="option1" />
+                        </div>)
+                },
+            },
+            {
+                Header: "ID",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return (cellProps.id)
+                },
+            },
+            {
+                Header: "Designation",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return cellProps.designation;
+                },
+            },
+            
+        ],
+        []
+      );
+
+
+
+
 
 
     return (
         <React.Fragment>
             <Head>
-                <title>Branch</title>
+                <title>Designation List</title>
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
-                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Designation List" />
+                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="" />
                     <div className="text-end m-2">
-                        <Button variant="primary" onClick={() => tog_grid()}>
-                            Add Designation
+                        <Button className='btn-sm' variant="primary" onClick={() => tog_grid()}>
+                        <div className='d-flex justify-content-center align-items-center'>
+                                <i className="ri-add-line align-bottom me-1"></i>Add new Designation
+                            </div>
                         </Button>
                     </div>
                     {/* <Button variant="primary" onClick={() => tog_grid()}>
@@ -46,7 +118,7 @@ const newPage = () => {
                         }}
                     >
                         <Modal.Header className="modal-title fw-bold">
-                            New Branch
+                            New Designation
                         </Modal.Header>
                         <Modal.Body>
                             <form action="#">
@@ -69,99 +141,40 @@ const newPage = () => {
                     </Modal>
 
 
-                    {/* Table */}
-                    <Col xxl={4}>
-                        <Card className="card-height-100">
-                            <Card.Header className="d-flex">
-                                <h5 className="card-title flex-grow-1 mb-0">List</h5>
-                                <div className="flex-shrink-0">
-                                    <Dropdown drop="start">
-                                        <Dropdown.Toggle as="a" className="arrow-none">
-                                            <i className="ri-more-2-fill fs-14"></i>
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu as="ul" className="dropdown-menu-end">
-                                            <li> <Dropdown.Item href="#">View</Dropdown.Item> </li>
-                                            <li> <Dropdown.Item href="#">Edit</Dropdown.Item> </li>
-                                            <li> <Dropdown.Item href="#">Delete</Dropdown.Item> </li>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </div>
-                            </Card.Header>
-                            <Card.Body>
-                                <div className="table-responsive table-card">
-                                    <table className="table table-borderless align-middle mb-0">
-                                        <thead className="table-active">
-                                            <tr>
-                                                <th scope="col">Email<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                                <th scope="col">Price<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                                <th scope="col">Tag<i className="ri-arrow-up-down-line align-middle ms-2"></i></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>jordan.martino@hybrix.com</td>
-                                                <td>$1.95</td>
-                                                <td><Link href="#" scroll={false} className="badge text-success bg-success-subtle">Paid</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>nancy.martino@hybrix.com</td>
-                                                <td>$5.00</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-warning">Pending</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>pieter.novitsky@hybrix.com</td>
-                                                <td>$2.05</td>
-                                                <td><Link href="#" scroll={false} className="badge text-success bg-success-subtle">Paid</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Ashley@hybrix.com</td>
-                                                <td>$69.99</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-danger">Cancelled</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Heather@hybrix.com</td>
-                                                <td>$16.78</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-danger">Cancelled</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Jimenez@hybrix.com</td>
-                                                <td>$79.99</td>
-                                                <td><Link href="#" scroll={false} className="badge text-success bg-success-subtle">Paid</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Daniel@hybrix.com</td>
-                                                <td>$87.00</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-warning">Pending</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Scott@hybrix.com</td>
-                                                <td>$42.32</td>
-                                                <td><Link href="#" scroll={false} className="badge badge-soft-danger">Cancelled</Link></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <ul className="pagination pagination-separated mb-0 mt-4 pt-1 justify-content-end">
-                                    <li className="page-item disabled">
-                                        <Link href="#" scroll={false} className="page-link">Previous</Link>
-                                    </li>
-                                    <li className="page-item active">
-                                        <Link href="#" scroll={false} className="page-link">1</Link>
-                                    </li>
-                                    <li className="page-item ">
-                                        <Link href="#" scroll={false} className="page-link">2</Link>
-                                    </li>
-                                    <li className="page-item">
-                                        <Link href="#" scroll={false} className="page-link">3</Link>
-                                    </li>
-                                    <li className="page-item">
-                                        <Link href="#" scroll={false} className="page-link">Next</Link>
-                                    </li>
-                                </ul>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
+                    {/* ______________________Table_____________________ */}
+                    <Row>
+                            <Col lg={10}>
+                                <Card id="apiKeyList">
+                                    <Card.Header className="d-flex align-items-center">
+                                        <h5 className="card-title flex-grow-1 mb-0">Designation List</h5>
+                                        
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <TableContainer
+                                            columns={(columns || [])}
+                                            data={(staticData || [])}
+                                            isPagination={true}
+                                            isGlobalFilter={true}
+                                            iscustomPageSize={false}
+                                            isBordered={false}
+                                            customPageSize={5}
+                                            className="custom-header-css table align-middle table-nowrap"
+                                            tableClassName="table-centered align-middle table-nowrap mb-0"
+                                            theadClassName="text-muted table-light"
+                                            SearchPlaceholder='Search Designation...'
+                                            
+                                        />
+                                        <div className="noresult" style={{ display: "none" }}>
+                                            <div className="text-center">
+                                                {/* <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon> */}
+                                                <h5 className="mt-2">Sorry! No Result Found</h5>
+                                                <p className="text-muted mb-0">We've searched more than 150+ API Keys We did not find any API for you search.</p>
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
                 </Container>
             </div>
         </React.Fragment >

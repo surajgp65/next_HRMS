@@ -2,48 +2,32 @@ import React, { ReactElement, useState, useMemo, useCallback } from 'react';
 import TableContainer from '@common/TableContainer';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Container } from 'react-bootstrap';
 import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
-import { Row, Col, Form, Button, Card, Dropdown, Modal } from 'react-bootstrap';
-import Select from 'react-select';
+import { Row, Col, Form, Button, Card, Dropdown, Modal, Container } from 'react-bootstrap';
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import moment from 'moment';
-
-
-
-
-
+import styles from './newHoliday.module.css'
+import SimpleBar from 'simplebar-react';
+import Flatpickr from "react-flatpickr";
 
 const newPage = () => {
-    const options = [
-        { value: 'monday', label: 'Monday' },
-        { value: 'tuesday', label: 'Tuesday' },
-        { value: 'wednesday', label: 'Wednesday' },
-        { value: 'thursday', label: 'Thursday' },
-        { value: 'friday', label: 'Friday' },
-        { value: 'saturday', label: 'Saturday' },
-
-        { value: 'CreateNewHoliday', label: 'Create new Holiday' }
-    ]
 
     const router = useRouter();
-
-    const [selectedOption, setSelectedOption] = useState(null);
     const [validated, setValidated] = useState(false);
 
 
     // API data
     const staticData = [
         {
-          id: 1,
-          name: "1",
-          createdBy: "John Doe",
-          apiKey: "abc123",
-          status: "Active",
-          createDate: "2023-10-09",
-          description: "Monday"
+            id: 1,
+            name: "1",
+            createdBy: "John Doe",
+            apiKey: "abc123",
+            status: "Active",
+            createDate: "12-10-2023",
+            description: "Monday"
         },
         {
             id: 2,
@@ -53,8 +37,8 @@ const newPage = () => {
             status: "Active",
             createDate: "2023-10-09",
             description: "Tuesday"
-          },
-          {
+        },
+        {
             id: 3,
             name: "3",
             createdBy: "John Doe2",
@@ -62,8 +46,8 @@ const newPage = () => {
             status: "Active",
             createDate: "2023-10-09",
             description: "Wednesday"
-          },
-          {
+        },
+        {
             id: 4,
             name: "4",
             createdBy: "John Doe2",
@@ -71,10 +55,28 @@ const newPage = () => {
             status: "Active",
             createDate: "2023-10-09",
             description: "Thursday"
-          },
-          
+        },
+        {
+            id: 5,
+            name: "5",
+            createdBy: "John Doe2",
+            apiKey: "abc12",
+            status: "Active",
+            createDate: "2023-10-09",
+            description: "Thursday"
+        },
+        {
+            id: 6,
+            name: "6",
+            createdBy: "John Doe2",
+            apiKey: "abc12",
+            status: "Active",
+            createDate: "2023-10-09",
+            description: "Thursday"
+        },
+
         // Add more objects as needed
-      ];
+    ];
 
 
 
@@ -89,12 +91,15 @@ const newPage = () => {
     const [isGenerateAPIKey, setIisGenerateAPIKey] = useState<any>()
 
     const [apiKeyName, setApiKeyName] = useState<any>();
-    const [deleteModal, setDeleteModal] = useState<boolean>(false)
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
 
-
-
-
+    // Date
+    const date: any = new Date();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const todaysDate = date.getDate();
+    const currentDate = todaysDate + "-" + month + "-" + year;
 
 
 
@@ -202,122 +207,112 @@ const newPage = () => {
         setValidated(true);
     };
 
-        // Change in the Option
-        const handleSelectChange = (selectedOption: any) => {
-            // Log the clicked option's value
-            console.log('Clicked option:', selectedOption?.value);
-            setSelectedOption(selectedOption);
-    
-            // Check if the selected option is "Strawberry"
-            if (selectedOption?.value === 'CreateNewHoliday') {
-                router.push("/pages/setup/company/companyForm/newHoliday");
-            }
-        };
 
 
-        const createApibutton = (e: any) => {
-            e.preventDefault();
-            let inputValue = (document.getElementById("api-key-name") as HTMLInputElement).value
-            setApiKeyName(inputValue)
-            if (inputValue) {
-                setsubmitBtn(true)
-                setIisGenerateAPIKey(generateApiID())
-            } else {
-                document.getElementById("api-key-error-msg")?.classList.remove("d-none")
-                document.getElementById("api-key-error-msg")?.classList.add("d-block")
-                setTimeout(() => {
-                    document.getElementById("api-key-error-msg")?.classList.remove("d-block")
-                    document.getElementById("api-key-error-msg")?.classList.add("d-none")
-                }, 1000);
-            }
+
+    const createApibutton = (e: any) => {
+        e.preventDefault();
+        let inputValue = (document.getElementById("api-key-name") as HTMLInputElement).value
+        setApiKeyName(inputValue)
+        if (inputValue) {
+            setsubmitBtn(true)
+            setIisGenerateAPIKey(generateApiID())
+        } else {
+            document.getElementById("api-key-error-msg")?.classList.remove("d-none")
+            document.getElementById("api-key-error-msg")?.classList.add("d-block")
+            setTimeout(() => {
+                document.getElementById("api-key-error-msg")?.classList.remove("d-block")
+                document.getElementById("api-key-error-msg")?.classList.add("d-none")
+            }, 1000);
         }
+    }
 
 
-        const columns = useMemo(
-            () => [
-                {
-                    id: "#",
-                    Header: "#",
-                    disableFilters: true,
-                    filterable: false,
-                    accessor: (cellProps: any) => {
-                        return (
-                            <div className="form-check">
-                                <input className="form-check-input" type="checkbox" name="chk_child" value="option1" />
-                            </div>)
-                    },
+    const columns = useMemo(
+        () => [
+            {
+                id: "#",
+                Header: "#",
+                disableFilters: true,
+                filterable: false,
+                accessor: (cellProps: any) => {
+                    return (
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" name="chk_child" value="option1" />
+                        </div>)
                 },
-                {
-                    Header: "No.",
-                    disableFilters: true,
-                    filterable: true,
-                    accessor: (cellProps: any) => {
-                        return (cellProps.name)
-                    },
+            },
+            {
+                Header: "No.",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return (cellProps.name)
                 },
-                {
-                    Header: "Date",
-                    disableFilters: true,
-                    filterable: true,
-                    accessor: (cellProps: any) => {
-                        return cellProps.createDate;
-                    },
+            },
+            {
+                Header: "Date",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return cellProps.createDate;
                 },
-                {
-                    Header: "Description",
-                    disableFilters: true,
-                    filterable: true,
-                    accessor: (cellProps: any) => {
-                        return cellProps.description;
-                    },
+            },
+            {
+                Header: "Description",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: any) => {
+                    return cellProps.description;
                 },
-                // {
-                //     Header: "API Key",
-                //     disableFilters: true,
-                //     filterable: true,
-                //     accessor: (cellProps: any) => {
-                //         return (
-                //             <input type="text" className="form-control apikey-value user-select-all" readOnly value={cellProps.apiKey} />
-                //         );
-                //     },
-                // },
-                // {
-                //     Header: "Status",
-                //     disableFilters: true,
-                //     filterable: true,
-                //     accessor: (cellProps: any) => {
-                //         switch (cellProps.status) {
-                //             case "Active":
-                //                 return (<span className="badge text-success bg-success-subtle"> {cellProps.status}</span>)
-                //             case "Disable":
-                //                 return (<span className="badge badge-soft-danger"> {cellProps.status}</span>)
-                //             default:
-                //                 return (<span className="badge text-success bg-success-subtle"> {cellProps.status}</span>)
-                //         }
-                //     },
-                // },
-                {
-                    Header: "Action",
-                    disableFilters: true,
-                    accessor: (cellProps: any) => {
-                        return (
-                            <Dropdown>
-                                <Dropdown.Toggle as="a" className="btn btn-soft-secondary btn-sm arrow-none">
-                                    <i className="ri-more-fill align-middle"></i>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu as="ul" className="dropdown-menu-end" style={{ position: "absolute", inset: "0px 0px auto auto", margin: "0px", transform: "translate(-73px, 33px)" }}>
-                                    <li><Dropdown.Item className="edit-item-btn" href="#" >Edit</Dropdown.Item></li>
-                                    {/* <li><Dropdown.Item className="regenerate-api-btn" href="#" >Regenerate Key</Dropdown.Item></li> */}
-                                    <li><Dropdown.Item className="remove-item-btn" href="#">Delete</Dropdown.Item></li>
-                                    <li><Dropdown.Item className="disable-btn" href="#">{cellProps.status === "Active" ? "Disable" : "Enable"}</Dropdown.Item></li>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        )
-                    },
+            },
+            // {
+            //     Header: "API Key",
+            //     disableFilters: true,
+            //     filterable: true,
+            //     accessor: (cellProps: any) => {
+            //         return (
+            //             <input type="text" className="form-control apikey-value user-select-all" readOnly value={cellProps.apiKey} />
+            //         );
+            //     },
+            // },
+            // {
+            //     Header: "Status",
+            //     disableFilters: true,
+            //     filterable: true,
+            //     accessor: (cellProps: any) => {
+            //         switch (cellProps.status) {
+            //             case "Active":
+            //                 return (<span className="badge text-success bg-success-subtle"> {cellProps.status}</span>)
+            //             case "Disable":
+            //                 return (<span className="badge badge-soft-danger"> {cellProps.status}</span>)
+            //             default:
+            //                 return (<span className="badge text-success bg-success-subtle"> {cellProps.status}</span>)
+            //         }
+            //     },
+            // },
+            {
+                Header: "Action",
+                disableFilters: true,
+                accessor: (cellProps: any) => {
+                    return (
+                        <Dropdown>
+                            <Dropdown.Toggle as="a" className="btn btn-soft-secondary btn-sm arrow-none">
+                                <i className="ri-more-fill align-middle"></i>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu as="ul" className="dropdown-menu-end" style={{ position: "absolute", inset: "0px 0px auto auto", margin: "0px", transform: "translate(-73px, 33px)" }}>
+                                <li><Dropdown.Item className="edit-item-btn" href="#" >Edit</Dropdown.Item></li>
+                                {/* <li><Dropdown.Item className="regenerate-api-btn" href="#" >Regenerate Key</Dropdown.Item></li> */}
+                                <li><Dropdown.Item className="remove-item-btn" href="#">Delete</Dropdown.Item></li>
+                                <li><Dropdown.Item className="disable-btn" href="#">{cellProps.status === "Active" ? "Disable" : "Enable"}</Dropdown.Item></li>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    )
                 },
-            ],
-            []
-        );
+            },
+        ],
+        []
+    );
 
 
 
@@ -326,10 +321,10 @@ const newPage = () => {
     return (
         <React.Fragment>
             <Head>
-                <title>newPage | Hybrix - Admin & Dashboard Template</title>
+                <title>Add New Holiday</title>
             </Head>
             <div className="page-content">
-                <Container fluid={true}>
+                <Container h-100 fluid={true}>
                     <Breadcrumb breadcrumb="Pages" breadcrumbItem="New Holiday List" />
 
 
@@ -355,7 +350,13 @@ const newPage = () => {
                         <Row className="mb-3">
                             <Form.Group as={Col} md="6" controlId="validationCustom03">
                                 <Form.Label>From Date</Form.Label>
-                                <Form.Control type="date" placeholder="" required />
+                                <Flatpickr
+                                    className="form-control"
+                                    options={{
+                                        dateFormat: "d-m-Y",
+                                        defaultDate: [currentDate]
+                                    }}
+                                />
                                 <Form.Control.Feedback type="invalid">
                                     Please provide a valid Date.
                                 </Form.Control.Feedback>
@@ -363,7 +364,13 @@ const newPage = () => {
 
                             <Form.Group as={Col} md="6" controlId="validationCustom03">
                                 <Form.Label>To Date</Form.Label>
-                                <Form.Control type="date" placeholder="" required />
+                                <Flatpickr
+                                    className="form-control"
+                                    options={{
+                                        dateFormat: "d-m-Y",
+
+                                    }}
+                                />
                                 <Form.Control.Feedback type="invalid">
                                     Please provide a valid Date.
                                 </Form.Control.Feedback>
@@ -379,111 +386,89 @@ const newPage = () => {
                         {/* conditional */}
                         <h5 style={{ paddingTop: "1rem" }}>Add Weekly Holidays</h5>
                         <Row>
-                        <Form.Group as={Col} md="6" controlId="validationCustom03">
+                            <Form.Group as={Col} md="6" controlId="validationCustom03">
                                 <Form.Label htmlFor="isGroup" className="form-label">Weekly Holidays</Form.Label>
-                                <Select
-                                    required
-                                    placeholder={<div>Default None</div>} 
-                                    options={options}
-                                    onChange={handleSelectChange}
-                                />
+                                <Dropdown>
+                                    <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Day" >
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
+                                        <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                                            <Dropdown.Item>Monday</Dropdown.Item>
+                                            <Dropdown.Item>Tuesday</Dropdown.Item>
+                                            <Dropdown.Item>Wednesday</Dropdown.Item>
+                                            <Dropdown.Item>Thursday</Dropdown.Item>
+                                            <Dropdown.Item>Friday</Dropdown.Item>
+                                            <Dropdown.Item>Saturday</Dropdown.Item>
+                                        </SimpleBar>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                                 <Form.Control.Feedback type="invalid">
                                     Please choose an option.
                                 </Form.Control.Feedback>
                             </Form.Group>
+
+
+
                         </Row>
                         <br />
-                        <Button>Add to holidays</Button>
+                        <Button className='btn-sm'>Add to holidays</Button>
+
 
                         <br />
                         <br />
 
                         {/* ______________________Table_____________________ */}
                         <Row>
-                        <Col lg={12}>
-                            <Card id="apiKeyList">
-                                <Card.Header className="d-flex align-items-center">
-                                    <h5 className="card-title flex-grow-1 mb-0">Holiday List</h5>
-                                    <div className="d-flex gap-1 flex-wrap">
-                                        <Button variant='soft-danger' id="remove-actions"><i className="ri-delete-bin-2-line"></i></Button>
-                                        <Button type="button" className="create-btn" onClick={toggle}><i className="ri-add-line align-bottom me-1"></i>Add New Row</Button>
-                                    </div>
-                                </Card.Header>
-                                <Card.Body>
-                                    <TableContainer
-                                        columns={(columns || [])}
-                                        data={(apiKeyList || [])}
-                                        isGlobalFilter={false}
-                                        iscustomPageSize={false}
-                                        customPageSize={8}
-                                        className="custom-header-css"
-                                        tableClass="table-centered align-middle table-nowrap mb-0"
-                                        theadClass="table-light"
-                                    />
-                                    <div className="noresult" style={{ display: "none" }}>
-                                        <div className="text-center">
-                                            {/* <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon> */}
-                                            <h5 className="mt-2">Sorry! No Result Found</h5>
-                                            <p className="text-muted mb-0">We've searched more than 150+ API Keys We did not find any API for you search.</p>
+                            <Col lg={12}>
+                                <Card id="apiKeyList">
+                                    <Card.Header className="d-flex align-items-center">
+                                        <h5 className="card-title flex-grow-1 mb-0">Holiday List</h5>
+                                        <div className="d-flex gap-1 flex-wrap">
+                                            <Button type="button" className="btn-sm" onClick={toggle}><i className="ri-add-line align-bottom me-1"></i>Add New Row</Button>
                                         </div>
-                                    </div>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <TableContainer
+                                            columns={(columns || [])}
+                                            data={(apiKeyList || [])}
+                                            isPagination={true}
+                                            isGlobalFilter={true}
+                                            iscustomPageSize={false}
+                                            isBordered={false}
+                                            customPageSize={5}
+                                            className="custom-header-css table align-middle table-nowrap"
+                                            tableClassName="table-centered align-middle table-nowrap mb-0"
+                                            theadClassName="text-muted table-light"
+                                            SearchPlaceholder='Search Dates...'
+                                            
+                                        />
+                                        <div className="noresult" style={{ display: "none" }}>
+                                            <div className="text-center">
+                                                {/* <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon> */}
+                                                <h5 className="mt-2">Sorry! No Result Found</h5>
+                                                <p className="text-muted mb-0">We've searched more than 150+ API Keys We did not find any API for you search.</p>
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
 
 
-
-
-
-
-                        <Col lg={6}>
-                            <div className="text-end m-2">
-                                <Button type="submit" variant="primary">Save</Button>
-                            </div>
-                        </Col>
                     </Form>
+                    <footer className={styles.footer}>
+                        <div className={styles.footerContent}>
+                            {/* Your other footer content */}
+                            <Button variant="success" className="btn-sm mx-4">Submit</Button>
+                            <button type="button" className="btn btn-sm btn-light">Reset</button>
+                        </div>
+                    </footer>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                   
-
-
-                   
-
-                    
-                    
                 </Container>
             </div>
 
-            
-            
+            {/*__________________ The POP UP Modal Code __________________ */}
+
             <Modal id="api-key-modal" className="fade" show={modalShow} onHide={toggle} contentClassName="border-0" centered>
                 <Modal.Header className="p-4 pb-0" closeButton>
                     <Modal.Title id="exampleModalLabel" className="fs-5 fw-bold">

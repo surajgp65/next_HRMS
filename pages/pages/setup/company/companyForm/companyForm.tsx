@@ -5,8 +5,13 @@ import { Container, Row, Col, Form, Button, InputGroup, Dropdown } from 'react-b
 import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
 import { useRouter } from 'next/router';
-import Select from 'react-select';
-import ReactFlagsSelect from "react-flags-select";
+import Flatpickr from "react-flatpickr";
+import SimpleBar from 'simplebar-react';
+import Image from 'next/image';
+
+// Country Data
+import country from '@common/data/country-list';
+
 
 
 // Define the types for country and selected option
@@ -19,24 +24,26 @@ const newPage = () => {
     const [validated, setValidated] = useState(false);
     const [selected, setSelected] = useState("");
     const [value, setValue] = useState<any>();
-    const [countries, setCountries] = useState<any>([]); // Specify the type as an array of Country
-    const [selectedCountry, setSelectedCountry] = useState<any>(null); // Specify the type as Country or null
+    // const [countries, setCountries] = useState<any>([]); // Specify the type as an array of Country
+    // const [selectedCountry, setSelectedCountry] = useState<any>(null); // Specify the type as Country or null
 
+    // Country Change States
+    const [seletedCountry, setseletedCountry] = useState('');
 
 
 
 
     // Functions
-    useEffect(() => {
-        fetch(
-            "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
-        )
-            .then((response) => response.json())
-            .then((data) => {
-                setCountries(data.countries);
-                setSelectedCountry(data.userSelectValue);
-            });
-    }, []);
+    // useEffect(() => {
+    //     fetch(
+    //         "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
+    //     )
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             setCountries(data.countries);
+    //             setSelectedCountry(data.userSelectValue);
+    //         });
+    // }, []);
 
 
     const changeCountryHandler = (value: any) => {
@@ -45,23 +52,9 @@ const newPage = () => {
 
 
 
-    const options = [
-        { value: 'option1', label: 'Option 1' },
-        { value: 'option 2', label: 'Option 2' },
-        { value: 'CreateNewHoliday', label: 'Create new Holiday' }
-    ]
-
-
     // Change in the Option
-    const handleSelectChange = (selectedOption: any) => {
-        // Log the clicked option's value
-        console.log('Clicked option:', selectedOption?.value);
-        setSelectedOption(selectedOption);
-
-        // Check if the selected option is "Strawberry"
-        if (selectedOption?.value === 'CreateNewHoliday') {
+    const handleCreateNewHolidayClick = () => {
             router.push("/pages/setup/company/companyForm/newHoliday");
-        }
     };
 
     const handleSubmit = (event: any) => {
@@ -149,30 +142,53 @@ const newPage = () => {
 
                         <Row className="mb-3">
 
-                            <Form.Group as={Col} md="6" controlId="validationCustom03">
-                                <Form.Label>Country</Form.Label>
-                                <Select
-                                    options={countries}
-                                    value={selectedCountry}
-                                    onChange={(selectedOption) => setSelectedCountry(selectedOption)}
-                                />
-                            </Form.Group>
-
                             
-                            <Form.Group as={Col} md="6" controlId="validationCustom03">
+
+                            <Form.Group as={Col} md="6">
                                 <Form.Label htmlFor="isGroup" className="form-label">Default Holiday List</Form.Label>
-                                <Select
-                                    required
-                                    options={options}
-                                    onChange={handleSelectChange}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    Please choose an option.
-                                </Form.Control.Feedback>
+                                <Dropdown>
+                                    <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Holiday List" readOnly>
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
+                                        <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                                            <Dropdown.Item>Option 1</Dropdown.Item>
+                                            <Dropdown.Item>Option 2</Dropdown.Item>
+                                            <Dropdown.Divider></Dropdown.Divider>
+                                            
+                                            <Dropdown.Item onClick={handleCreateNewHolidayClick}><div className='d-flex justify-content-center align-items-center text-primary'><span className="bx bx-plus-medical" style={{ padding: 3 }}></span>Create new Holiday</div></Dropdown.Item>
+                                        </SimpleBar>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </Form.Group>
 
 
-                            
+                            <Form.Group as={Col} md="6">
+                                <Form.Label> Country</Form.Label>
+                                <Dropdown>
+                                    <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Country" readOnly defaultValue={seletedCountry}>
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
+                                        <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                                            {(country || []).map((item: any, key: number) => (
+                                                <Dropdown.Item as='li' onClick={() => setseletedCountry(item.countryName)} key={key} className="dropdown-item d-flex">
+                                                    <div className="flex-shrink-0 me-2">
+                                                        <Image src={item.flagImg} alt="country flag" className="options-flagimg" height="20" />
+                                                    </div>
+                                                    <div className="flex-grow-1">
+                                                        <div className="d-flex">
+                                                            <div className="country-name me-1">{item.countryName}</div>
+                                                            <span className="countrylist-codeno text-muted">{item.countryCode}</span>
+                                                        </div>
+                                                    </div>
+                                                </Dropdown.Item>
+                                            ))}
+                                        </SimpleBar>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </Form.Group>
+
+
+
 
                         </Row>
 
@@ -191,15 +207,20 @@ const newPage = () => {
                                 <Form.Label>Parent Company</Form.Label>
                                 <Form.Control type="text" required />
                                 <Form.Control.Feedback type="invalid">
-                                    Please provide a valid date.
+                                    Please provide a valid answer.
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Row>
 
                         <Row>
-                        <Form.Group as={Col} md="6" controlId="validationCustom03">
+                            <Form.Group as={Col} md="6" controlId="validationCustom03">
                                 <Form.Label>Date of Establishment</Form.Label>
-                                <Form.Control type="date" required />
+                                <Flatpickr
+                                    className="form-control"
+                                    options={{
+                                        dateFormat: "d-m-Y",
+                                    }}
+                                />
                                 <Form.Control.Feedback type="invalid">
                                     Please provide a valid date.
                                 </Form.Control.Feedback>
@@ -209,11 +230,10 @@ const newPage = () => {
                         {/* Divider */}
                         <hr className='hr hr-blurry'></hr>
 
-                        <h6 className='bold'>Hello</h6>
 
 
 
-                        <Button type="submit">Submit form</Button>
+                        <Button className='btn-sm'>Submit</Button>
                     </Form>
                 </Container>
             </div>

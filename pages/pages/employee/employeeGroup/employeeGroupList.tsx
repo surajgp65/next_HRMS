@@ -2,9 +2,16 @@ import React, { ReactElement, useState, useMemo } from 'react';
 import Head from 'next/head';
 import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
-import { useRouter } from 'next/router';
-import { Card, Col, Row, Button, Modal, Form, Container } from 'react-bootstrap';
+import { Card, Col, Button, Row, Container } from 'react-bootstrap';
 import TableContainer from '@common/TableContainer';
+
+
+
+
+
+
+
+import { useRouter } from 'next/router';
 
 
 
@@ -12,54 +19,41 @@ const newPage = () => {
 
     const router = useRouter();
 
+    const handleAddButtonClick = () => {
+        router.push('/pages/leaves/compensatoryLeaveApp/compensatoryForm/compensatoryForm');
+      };
 
-    // Data for the Table 
-    const staticData = [
-        {
-            id: 1,
-            employeeName: "Anurag",
-            status: "Present",
-            attendanceDate: "12-10-2023",
-        },
-        {
-            id: 1,
-            employeeName: "Anurag",
-            status: "Work from home",
-            attendanceDate: "13-10-2023",
-        },
-        {
-            id: 1,
-            employeeName: "Anurag",
-            status: "Present",
-            attendanceDate: "12-10-2023",
-        },
-        {
-            id: 1,
-            employeeName: "Anurag",
-            status: "Work from home",
-            attendanceDate: "13-10-2023",
-        },
-        {
-            id: 1,
-            employeeName: "Anurag",
-            status: "Present",
-            attendanceDate: "12-10-2023",
-        },
-        {
-            id: 1,
-            employeeName: "Anurag",
-            status: "Work from home",
-            attendanceDate: "13-10-2023",
-        },
 
+       // Data for the Table 
+       const staticData = [
+        {
+            id: 1,
+            groupName: "Front-end",
+        },
+        {
+            id: 2,
+            groupName: "Back-end",
+        },
+        {
+            id: 3,
+            groupName: "Front-end",
+        },
+        {
+            id: 4,
+            groupName: "Back-end",
+        },
+        
         // Add more objects as needed
     ];
+
+
+        // Table Headers and populating cells
 
     const columns = useMemo(
         () => [
             {
                 id: "#",
-                Header: "#",
+                Header: "",
                 disableFilters: true,
                 filterable: false,
                 accessor: (cellProps: any) => {
@@ -78,27 +72,11 @@ const newPage = () => {
                 },
             },
             {
-                Header: "Employee Name",
+                Header: "Group Name",
                 disableFilters: true,
                 filterable: true,
                 accessor: (cellProps: any) => {
-                    return cellProps.employeeName;
-                },
-            },
-            {
-                Header: "Status",
-                disableFilters: true,
-                filterable: true,
-                accessor: (cellProps: any) => {
-                    return cellProps.status;
-                },
-            },
-            {
-                Header: "Attendance Date",
-                disableFilters: true,
-                filterable: true,
-                accessor: (cellProps: any) => {
-                    return cellProps.attendanceDate;
+                    return (cellProps.groupName)
                 },
             },
             
@@ -107,37 +85,27 @@ const newPage = () => {
       );
 
 
-
-      const handleAddButtonClick = () => {
-        router.push('/pages/attendance/attendance/attendanceForm/attendanceForm');
-      };
-
-
+        
+        
 
     return (
         <React.Fragment>
             <Head>
-                <title>Attendance List</title>
+                <title>Employee List</title>
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
-                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Attendance" />
+                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Employee Group" />
                     <div className="text-end m-2">
-                    <Button type="button" className="btn-sm" onClick={handleAddButtonClick}><i className="ri-add-line align-bottom me-1"></i>Add Attendance</Button>
-
-                        
+                        <Button type="button" className="btn-sm" onClick={handleAddButtonClick}><i className="ri-add-line align-bottom me-1"></i>Add Employee Group</Button>
                     </div>
-                    {/* <Button variant="primary" onClick={() => tog_grid()}>
-                        Add Branch
-                    </Button> */}
-
 
                     {/* ______________________Table_____________________ */}
                     <Row>
-                            <Col lg={12}>
+                            <Col lg={8}>
                                 <Card id="apiKeyList">
                                     <Card.Header className="d-flex align-items-center">
-                                        <h5 className="card-title flex-grow-1 mb-0">Attendance List</h5>
+                                        <h5 className="card-title flex-grow-1 mb-0">Employee Group List</h5>
                                         
                                     </Card.Header>
                                     <Card.Body>
@@ -152,7 +120,8 @@ const newPage = () => {
                                             className="custom-header-css table align-middle table-nowrap"
                                             tableClassName="table-centered align-middle table-nowrap mb-0"
                                             theadClassName="text-muted table-light"
-                                            SearchPlaceholder='Search Attendance...'
+                                            SearchPlaceholder='Search Employee...'
+                                            
                                             
                                         />
                                         <div className="noresult" style={{ display: "none" }}>
@@ -166,6 +135,7 @@ const newPage = () => {
                                 </Card>
                             </Col>
                         </Row>
+
                 </Container>
             </div>
         </React.Fragment >

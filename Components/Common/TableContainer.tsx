@@ -9,12 +9,14 @@ import {
   usePagination,
 } from "react-table";
 import { Table, Row, Col, Button } from "react-bootstrap";
-import { Filter, DefaultColumnFilter } from "@common/Filter";
+import { Filter, DefaultColumnFilter } from "./Filter";
 
 interface GlobalFilterProps {
   preGlobalFilteredRows?: any;
   globalFilter?: any;
   setGlobalFilter?: any;
+  SearchPlaceholder?: string;
+  isProductsFilter?: boolean;
 }
 
 // Define a default UI for filtering
@@ -22,8 +24,9 @@ function GlobalFilter({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
+  SearchPlaceholder,
+  isProductsFilter
 }: GlobalFilterProps) {
-  const count = preGlobalFilteredRows.length;
   const [value, setValue] = React.useState(globalFilter);
   const onChange = (value: any) => {
     setGlobalFilter(value || undefined);
@@ -31,29 +34,24 @@ function GlobalFilter({
 
   return (
     <React.Fragment>
-      <Col md={4}>
-        <div className="search-box me-xxl-2 my-3 my-xxl-0 d-inline-block">
-          <div className="position-relative">
-            <label htmlFor="search-bar-0" className="search-label">
-              <span id="search-bar-0-label" className="sr-only">
-                Search this table
-              </span>
-              <input
-                onChange={e => {
-                  setValue(e.target.value);
-                  onChange(e.target.value);
-                }}
-                id="search-bar-0"
-                type="text"
-                className="form-control"
-                placeholder={`${count} records...`}
-                value={value || ""}
-              />
-            </label>
-            <i className="bx bx-search-alt search-icon"></i>
-          </div>
+      <Col className="col-sm">
+        <div className="d-flex justify-content-sm-end">
+          <label htmlFor="search-bar-0" className="search-label">
+            <input
+              onChange={e => {
+                setValue(e.target.value);
+                onChange(e.target.value);
+              }}
+              id="search-bar-0"
+              type="text"
+              className="form-control"
+              placeholder={SearchPlaceholder}
+              value={value || ""}
+            />
+          </label>
         </div>
       </Col>
+
     </React.Fragment>
   );
 }
@@ -62,7 +60,11 @@ interface TableContainerProps {
   columns?: any;
   data?: any;
   isGlobalFilter?: any;
+  isPagination?: any;
   isAddOptions?: any;
+  divClassName?: any;
+  tableClassName?: any;
+  theadClassName?: any,
   tableClass?: any;
   theadClass?: any;
   isBordered?: boolean;
@@ -75,6 +77,8 @@ interface TableContainerProps {
   className?: any;
   customPageSizeOptions?: any;
   iscustomPageSize?: boolean;
+  SearchPlaceholder: string;
+  isProductsFilter?: boolean;
 }
 
 const TableContainer = ({
@@ -84,6 +88,8 @@ const TableContainer = ({
   theadClass,
   isBordered,
   isGlobalFilter,
+  isPagination,
+  isProductsFilter,
   isAddOptions,
   isAddUserList,
   handleOrderClicks,
@@ -93,6 +99,7 @@ const TableContainer = ({
   customPageSize,
   iscustomPageSize,
   customPageSizeOptions,
+  SearchPlaceholder
 }: TableContainerProps) => {
   const {
     getTableProps,
@@ -143,77 +150,77 @@ const TableContainer = ({
 
   return (
     <Fragment>
-      {(iscustomPageSize || isGlobalFilter || isAddOptions || isAddUserList || isAddCustList) && (
-        <Row className="mb-2">
-          {iscustomPageSize && (
-            <Col md={customPageSizeOptions ? 2 : 1}>
-              <select
-                className="form-select"
-                value={pageSize}
-                onChange={onChangeInSelect}
+      <Row className="mb-2">
+        {iscustomPageSize && (
+          <Col md={customPageSizeOptions ? 2 : 1}>
+            <select
+              className="form-select"
+              value={pageSize}
+              onChange={onChangeInSelect}
+            >
+              {[10, 20, 30, 40, 50].map(pageSize => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </select>
+          </Col>
+        )}
+        {isGlobalFilter && (
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            SearchPlaceholder={SearchPlaceholder}
+            isProductsFilter={isProductsFilter}
+          />
+        )}
+        {isAddOptions && (
+          <Col sm="7">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                variant="success"
+                className="btn-rounded  mb-2 me-2"
+                onClick={handleOrderClicks}
               >
-                {[10, 20, 30, 40, 50].map(pageSize => (
-                  <option key={pageSize} value={pageSize}>
-                    Show {pageSize}
-                  </option>
-                ))}
-              </select>
-            </Col>
-          )}
-          {isGlobalFilter && (
-            <GlobalFilter
-              preGlobalFilteredRows={preGlobalFilteredRows}
-              globalFilter={state.globalFilter}
-              setGlobalFilter={setGlobalFilter}
-            />
-          )}
-          {isAddOptions && (
-            <Col sm="7">
-              <div className="text-sm-end">
-                <Button
-                  type="button"
-                  variant="success"
-                  className="btn-rounded  mb-2 me-2"
-                  onClick={handleOrderClicks}
-                >
-                  <i className="mdi mdi-plus me-1" />
-                  Add New Order
-                </Button>
-              </div>
-            </Col>
-          )}
-          {isAddUserList && (
-            <Col sm="7">
-              <div className="text-sm-end">
-                <Button
-                  type="button"
-                  variant="primary"
-                  className="btn mb-2 me-2"
-                  onClick={handleUserClick}
-                >
-                  <i className="mdi mdi-plus-circle-outline me-1" />
-                  Create New User
-                </Button>
-              </div>
-            </Col>
-          )}
-          {isAddCustList && (
-            <Col sm="7">
-              <div className="text-sm-end">
-                <Button
-                  type="button"
-                  variant="success"
-                  className="btn-rounded mb-2 me-2"
-                  onClick={handleCustomerClick}
-                >
-                  <i className="mdi mdi-plus me-1" />
-                  Customers
-                </Button>
-              </div>
-            </Col>
-          )}
-        </Row>
-      )}
+                <i className="mdi mdi-plus me-1" />
+                Add New Order
+              </Button>
+            </div>
+          </Col>
+        )}
+        {isAddUserList && (
+          <Col sm="7">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                variant="primary"
+                className="btn mb-2 me-2"
+                onClick={handleUserClick}
+              >
+                <i className="mdi mdi-plus-circle-outline me-1" />
+                Create New User
+              </Button>
+            </div>
+          </Col>
+        )}
+        {isAddCustList && (
+          <Col sm="7">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                variant="success"
+                className="btn-rounded mb-2 me-2"
+                onClick={handleCustomerClick}
+              >
+                <i className="mdi mdi-plus me-1" />
+                Customers
+              </Button>
+            </div>
+          </Col>
+        )}
+      </Row>
 
       <div className="table-responsive react-table">
         <Table hover {...getTableProps()} className={tableClass} bordered={isBordered}>
@@ -222,7 +229,7 @@ const TableContainer = ({
               <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((columns: any) => (
                   <th key={columns.id}>
-                    <div className="" {...columns.getSortByToggleProps()}>
+                    <div className="mb-2" {...columns.getSortByToggleProps()}>
                       {columns.render("Header")}
                       {generateSortingIndicator(columns)}
                     </div>
@@ -253,12 +260,12 @@ const TableContainer = ({
           </tbody>
         </Table>
       </div>
-      <Row className="align-items-center mt-2 py-2 px-2 gy-2 text-center text-sm-start">
+      {isPagination && <Row className="align-items-center mt-2 py-2 px-2 gy-2 text-center text-sm-start">
         <div className="col-sm">
           <div className="text-muted">Showing <span className="fw-semibold">{pageIndex + 1}</span> of <span className="fw-semibold">{pageOptions.length}</span> Results</div>
         </div>
         <div className="col-sm-auto">
-          <ul className="pagination pagination-separated pagination-md mb-0 justify-content-center justify-content-sm-start">
+          <ul className="pagination pagination-separated mb-0 justify-content-center justify-content-sm-start">
             <li className={!canPreviousPage ? "page-item disabled" : "page-item"} onClick={previousPage}>
               <Button variant="link" className="page-link">Previous</Button>
             </li>
@@ -274,7 +281,7 @@ const TableContainer = ({
             </li>
           </ul>
         </div>
-      </Row>
+      </Row>}
     </Fragment>
   );
 };

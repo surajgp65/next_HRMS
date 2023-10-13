@@ -4,6 +4,8 @@ import { Container, Row, Col, Form, Button, InputGroup, Dropdown } from 'react-b
 import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
 import { useRouter } from 'next/router';
+import Flatpickr from "react-flatpickr";
+
 
 const newPage = () => {
   const router = useRouter();
@@ -19,6 +21,13 @@ const newPage = () => {
 
     setValidated(true);
   };
+
+  // Date
+  const date: any = new Date();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const todaysDate = date.getDate();
+  const currentDate = todaysDate + "-" + month + "-" + year;
 
 
   return (
@@ -62,20 +71,37 @@ const newPage = () => {
 
             </Row>
             <hr className="hr-blurry" />
-            <Row>
-              <Col md={6}>
-                <div className="mb-3">
-                  <Form.Label htmlFor="fromDate" className="form-label">From Date</Form.Label>
-                  <Form.Control type="date" placeholder="" id="fromDate" />
-                </div>
-              </Col>
-              <Col md={6}>
-                <div className="mb-3">
-                  <Form.Label htmlFor="toDate" className="form-label">To Date</Form.Label>
-                  <Form.Control type="date" placeholder="" id="toDate" />
-                </div>
-              </Col>
-            </Row>
+            <Row className="mb-3">
+                            <Form.Group as={Col} md="6" controlId="validationCustom03">
+                                <Form.Label>From Date</Form.Label>
+                                <Flatpickr
+                                    className="form-control"
+                                    options={{
+                                        dateFormat: "d-m-Y",
+                                        defaultDate: [currentDate]
+                                    }}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide a valid Date.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group as={Col} md="6" controlId="validationCustom03">
+                                <Form.Label>To Date</Form.Label>
+                                <Flatpickr
+                                    className="form-control"
+                                    options={{
+                                        dateFormat: "d-m-Y",
+
+                                    }}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide a valid Date.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+
+                        </Row>
             <Col xxl={3} md={6}>
               <Form.Group>
                 <Form.Label>Reason</Form.Label>
@@ -130,7 +156,7 @@ const newPage = () => {
 
 
 
-            <Button type="submit">Submit form</Button>
+            <Button type="submit" className="btn-sm" variant="success">Submit form</Button>
           </Form>
         </Container>
       </div>

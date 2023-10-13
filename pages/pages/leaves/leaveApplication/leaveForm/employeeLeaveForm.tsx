@@ -8,12 +8,12 @@ const newPage = () => {
     return (
         <React.Fragment>
             <Head>
-                <title>Employee List | Hybrix - Admin & Dashboard Template</title>
+                <title>Employee Leave Form</title>
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
-                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="newPage" />
-                    // write Typescript Code Here.
+                    <Breadcrumb breadcrumb="Pages" breadcrumbItem="Employee Leave Form" />
+                    Employee Leave form
                 </Container>
             </div>
         </React.Fragment >

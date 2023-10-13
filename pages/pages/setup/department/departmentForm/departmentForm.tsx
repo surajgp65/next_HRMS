@@ -5,6 +5,8 @@ import Breadcrumb from '@common/Breadcrumb';
 import Layout from '@common/Layout';
 import { useRouter } from 'next/router';
 import Select from 'react-select';
+import SimpleBar from 'simplebar-react';
+
 
 
 
@@ -45,16 +47,12 @@ const newPage = () => {
 
 
     // Change in the Option
-    const handleSelectChange = (selectedOption: any) => {
-        // Log the clicked option's value
-        console.log('Clicked option:', selectedOption?.value);
-        setSelectedOption(selectedOption);
-
-        // Check if the selected option is "Strawberry"
-        if (selectedOption?.value === 'CreateNewCostCenter') {
-            router.push("/pages/setup/company/companyForm/newHoliday");
-        }
-    };
+    const handleCreateNewPayrollClick = () => {
+        router.push("/pages/setup/department/departmentForm/payrollForm");
+};
+    const handleCreateNewBlockListClick = () => {
+        router.push("/pages/setup/company/companyForm/newHoliday");
+};
 
     return (
         <React.Fragment>
@@ -124,18 +122,36 @@ const newPage = () => {
 
                             <Col md={6}>
                             <Form.Label htmlFor="isGroup" className="form-label">Payroll Cost Center</Form.Label>
-                                <Select
-                                    options={options}
-                                    onChange={handleSelectChange}
-                                />
+                            <Dropdown>
+                                    <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Payroll" readOnly >
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
+                                        <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                                            <Dropdown.Item>Option 1</Dropdown.Item>
+                                            <Dropdown.Item>Option 2</Dropdown.Item>
+                                            <Dropdown.Divider></Dropdown.Divider>
+                                            
+                                            <Dropdown.Item onClick={handleCreateNewPayrollClick}><div className='d-flex justify-content-center align-items-center text-primary'><span className="bx bx-plus-medical" style={{ padding: 3 }}></span>Create New Payroll</div></Dropdown.Item>
+                                        </SimpleBar>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </Col>
                             
                             <Col md={6}>
                             <Form.Label htmlFor="isGroup" className="form-label">Leave Block List</Form.Label>
-                                <Select
-                                    options={options2}
-                                    onChange={handleSelectChange}
-                                />
+                            <Dropdown>
+                                    <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Leave Block List" readOnly >
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
+                                        <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                                            <Dropdown.Item>Option 1</Dropdown.Item>
+                                            <Dropdown.Item>Option 2</Dropdown.Item>
+                                            <Dropdown.Divider></Dropdown.Divider>
+                                            
+                                            <Dropdown.Item onClick={handleCreateNewBlockListClick}><div className='d-flex justify-content-center align-items-center text-primary'><span className="bx bx-plus-medical" style={{ padding: 3 }}></span>Create a new Leave Block List</div></Dropdown.Item>
+                                        </SimpleBar>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </Col>
                             
                         </Row>
@@ -149,7 +165,7 @@ const newPage = () => {
 
 
 
-                        <Button type="submit">Submit form</Button>
+                        <Button className='btn-sm' type="submit">Submit form</Button>
                     </Form>
                 </Container>
             </div>
