@@ -41,7 +41,7 @@ const newPage = () => {
     return (
         <React.Fragment>
             <Head>
-                <title>New Attendance</title>
+                <title>New Employee Checkin</title>
             </Head>
             <div className="page-content">
                 <Container fluid={true}>
@@ -51,7 +51,7 @@ const newPage = () => {
 
                         <Card>
                             <Card.Header>
-                                <h4 className="card-title mb-0">New Attendance Request</h4>
+                                <h4 className="card-title mb-0">New Employee Checkin</h4>
                             </Card.Header>
 
                             <Card.Body>
