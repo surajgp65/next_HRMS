@@ -133,7 +133,7 @@ const newPage = () => {
                                     <Col lg={12}>
                                         <div className="hstack gap-2 justify-content-end">
                                             <Button variant="light" onClick={() => setmodal_grid(false)}>Close</Button>
-                                            <Button variant="primary" >Add</Button>
+                                            <Button variant="primary">Add</Button>
                                         </div>
                                     </Col>
                                 </div>

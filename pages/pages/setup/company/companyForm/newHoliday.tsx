@@ -455,14 +455,15 @@ const newPage = () => {
                         </Row>
 
 
-                    </Form>
                     <footer className={styles.footer}>
-                        <div className={styles.footerContent}>
-                            {/* Your other footer content */}
+                    <Card className='w-100 rounded-0 p-2'>
+                    <div className={styles.footerContent}>
                             <Button variant="success" className="btn-sm mx-4">Submit</Button>
                             <button type="button" className="btn btn-sm btn-light">Reset</button>
                         </div>
+                            </Card>
                     </footer>
+                    </Form>
 
                 </Container>
             </div>

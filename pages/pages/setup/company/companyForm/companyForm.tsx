@@ -22,8 +22,15 @@ const newPage = () => {
     const router = useRouter();
     const [selectedOption, setSelectedOption] = useState(null);
     const [validated, setValidated] = useState(false);
-    const [selected, setSelected] = useState("");
-    const [value, setValue] = useState<any>();
+
+    // Holiday Dropdown
+    const [selectedHolidayOption, setSelectedHolidayOption] = useState();
+    const handleHolidayOptionClick = (option:any) => {
+        setSelectedHolidayOption(option);
+      };
+
+    // const [selected, setSelected] = useState("");
+    // const [value, setValue] = useState<any>();
     // const [countries, setCountries] = useState<any>([]); // Specify the type as an array of Country
     // const [selectedCountry, setSelectedCountry] = useState<any>(null); // Specify the type as Country or null
 
@@ -46,9 +53,9 @@ const newPage = () => {
     // }, []);
 
 
-    const changeCountryHandler = (value: any) => {
-        setValue(value)
-    }
+    // const changeCountryHandler = (value: any) => {
+    //     setValue(value)
+    // }
 
 
 
@@ -147,12 +154,12 @@ const newPage = () => {
                             <Form.Group as={Col} md="6">
                                 <Form.Label htmlFor="isGroup" className="form-label">Default Holiday List</Form.Label>
                                 <Dropdown>
-                                    <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Holiday List" readOnly>
+                                <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" value={selectedHolidayOption} readOnly>
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
                                         <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
-                                            <Dropdown.Item>Option 1</Dropdown.Item>
-                                            <Dropdown.Item>Option 2</Dropdown.Item>
+                                            <Dropdown.Item onClick={() =>  handleHolidayOptionClick("Option 1")}>Option 1</Dropdown.Item>
+                                            <Dropdown.Item onClick={() =>  handleHolidayOptionClick("Option 2")}>Option 2</Dropdown.Item>
                                             <Dropdown.Divider></Dropdown.Divider>
                                             
                                             <Dropdown.Item onClick={handleCreateNewHolidayClick}><div className='d-flex justify-content-center align-items-center text-primary'><span className="bx bx-plus-medical" style={{ padding: 3 }}></span>Create new Holiday</div></Dropdown.Item>

@@ -9,7 +9,6 @@ import logoLightFull from "@assets/images/logo-light-full.png";
 import authEffect2 from "@assets/images/effect-pattern/auth-effect-2.png";
 import authEffect from "@assets/images/effect-pattern/auth-effect.png";
 import error400 from "@assets/images/error400.png";
-
 import Link from 'next/link';
 
 const Error404Basic = () => {

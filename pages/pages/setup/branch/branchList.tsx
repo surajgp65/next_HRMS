@@ -34,6 +34,22 @@ const newPage = () => {
             id: 2,
             branch: "HQ"
         },
+        {
+            id: 3,
+            branch: "HR"
+        },
+        {
+            id: 4,
+            branch: "HQ"
+        },
+        {
+            id: 5,
+            branch: "HR"
+        },
+        {
+            id: 6,
+            branch: "HQ"
+        },
 
         // Add more objects as needed
     ];
@@ -126,38 +142,38 @@ const newPage = () => {
 
                     {/* ______________________Table_____________________ */}
                     <Row>
-                            <Col lg={12}>
-                                <Card id="apiKeyList">
-                                    <Card.Header className="d-flex align-items-center">
-                                        <h5 className="card-title flex-grow-1 mb-0">Branch List</h5>
-                                        
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <TableContainer
-                                            columns={(columns || [])}
-                                            data={(staticData || [])}
-                                            isPagination={true}
-                                            isGlobalFilter={true}
-                                            iscustomPageSize={false}
-                                            isBordered={false}
-                                            customPageSize={5}
-                                            className="custom-header-css table align-middle table-nowrap"
-                                            tableClassName="table-centered align-middle table-nowrap mb-0"
-                                            theadClassName="text-muted table-light"
-                                            SearchPlaceholder='Search Branch...'
-                                            
-                                        />
-                                        <div className="noresult" style={{ display: "none" }}>
-                                            <div className="text-center">
-                                                {/* <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon> */}
-                                                <h5 className="mt-2">Sorry! No Result Found</h5>
-                                                <p className="text-muted mb-0">We've searched more than 150+ API Keys We did not find any API for you search.</p>
-                                            </div>
+                        <Col lg={12}>
+                            <Card id="apiKeyList">
+                                <Card.Header className="d-flex align-items-center">
+                                    <h5 className="card-title flex-grow-1 mb-0">Branch List</h5>
+
+                                </Card.Header>
+                                <Card.Body>
+                                    <TableContainer
+                                        columns={(columns || [])}
+                                        data={(staticData || [])}
+                                        isPagination={true}
+                                        isGlobalFilter={true}
+                                        iscustomPageSize={false}
+                                        isBordered={false}
+                                        customPageSize={5}
+                                        className="custom-header-css table align-middle table-nowrap"
+                                        tableClassName="table-centered align-middle table-nowrap mb-0"
+                                        theadClassName="text-muted table-light"
+                                        SearchPlaceholder='Search Designation...'
+
+                                    />
+                                    <div className="noresult" style={{ display: "none" }}>
+                                        <div className="text-center">
+                                            {/* <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon> */}
+                                            <h5 className="mt-2">Sorry! No Result Found</h5>
+                                            <p className="text-muted mb-0">We've searched more than 150+ API Keys We did not find any API for you search.</p>
                                         </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
+                                    </div>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
                 </Container>
             </div>
         </React.Fragment >

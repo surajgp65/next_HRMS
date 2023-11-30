@@ -21,6 +21,36 @@ const newPage = () => {
     const [editor, setEditor] = useState(false);
     const { CKEditor, ClassicEditor }: any = editorRef.current || {};
     const [data, setData] = useState('');
+    const [activeTab, setActiveTab] = useState<any>('overview');
+
+
+    // Overview Data
+    const [overviewData, setOverviewData] = useState<any>({
+        series: '',
+        firstName: '',
+        dateOfBirth: '',
+        status: '',
+      });
+
+    // Handle Input change
+    const handleInputChange = (event:any) => {
+        const { name, value } = event.target;
+        setOverviewData({ ...overviewData, [name]: value });
+        console.log( event.target.value);
+      };
+
+
+    const handleSubmit = () => {
+        // Access overviewData to save or submit the data
+        console.log('Form Data:', overviewData);
+        // Perform your data saving or submission logic here.
+    };
+
+
+
+
+
+
 
 
     useEffect(() => {
@@ -31,6 +61,9 @@ const newPage = () => {
         setEditor(true);
     }, []);
 
+    const changeActiveTab = (eventKey:any) => {
+        setActiveTab("joining");
+      };
 
 
     // Change in the Option
@@ -280,7 +313,7 @@ const newPage = () => {
                         <Col xxl={6}>
                             <Card>
                                 <Card.Body>
-                                    <Tab.Container defaultActiveKey="overview">
+                                    <Tab.Container defaultActiveKey="overview" activeKey={activeTab} onSelect={(key) => setActiveTab(key)}>
 
                                         <Nav as="ul" variant='tabs' className="mb-3">
                                             <Nav.Item as="li"> <Nav.Link eventKey="overview"> Overview </Nav.Link> </Nav.Item>
@@ -295,10 +328,14 @@ const newPage = () => {
 
                                         <Tab.Content className="text-muted">
                                             <Tab.Pane eventKey="overview" id="overview">
+                                                {/* <Button className='btn-sm' onClick={changeActiveTab}>Change Tab</Button> */}
                                                 <Row className="mb-3">
                                                     <Col md={4}>
-                                                        <Form.Label htmlFor="validationDefault01" className="form-label">Series</Form.Label>
-                                                        <Form.Control type="text" id="validationDefault01" required />
+                                                        <Form.Label htmlFor="validationDefault01" className="form-label">Series<span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Control 
+                                                        type="text" 
+                                                        id="validationDefault01" 
+                                                        name="series" value={overviewData.series} onChange={handleInputChange}  required />
                                                     </Col>
 
                                                     <Col md={4}>
@@ -329,7 +366,14 @@ const newPage = () => {
                                                 <Row className="mb-3">
                                                     <Col md={4}>
                                                         <Form.Label htmlFor="validationDefault01" className="form-label">First Name</Form.Label>
-                                                        <Form.Control type="text" id="validationDefault01" required />
+                                                        <Form.Control 
+                                                            type="text" 
+                                                            id="validationDefault01" 
+                                                            required 
+                                                            name="firstName"
+                                                            value={overviewData.firstName} 
+                                                            onChange={handleInputChange} 
+                                                            />
                                                     </Col>
                                                     <Col md={4}>
                                                         <Form.Label htmlFor="validationDefault01" className="form-label">Date of Birth</Form.Label>
@@ -358,6 +402,10 @@ const newPage = () => {
                                                     </Col>
                                                     <Col md={4}>
                                                         <Form.Label htmlFor="validationDefault01" className="form-label">Salution</Form.Label>
+                                                        <Form.Control type="text" id="validationDefault01" required />
+                                                    </Col>
+                                                    <Col md={4}>
+                                                        <Form.Label htmlFor="validationDefault01" className="form-label">Last Name</Form.Label>
                                                         <Form.Control type="text" id="validationDefault01" required />
                                                     </Col>
                                                 </Row>
@@ -519,7 +567,7 @@ const newPage = () => {
                                                             className="form-control"
                                                             options={{
                                                                 dateFormat: "d-m-Y",
-
+                                                                allowInput: true
                                                             }}
                                                         />
                                                     </Col>
@@ -700,7 +748,7 @@ const newPage = () => {
                                                     <Col md={6}>
                                                         <Form.Label htmlFor="isGroup" className="form-label">Holiday List</Form.Label>
                                                         <Dropdown onSelect={handleDropDownCreateNew}>
-                                                            <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Holiday List" readOnly>
+                                                            <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="" readOnly>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
                                                                 <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
@@ -727,7 +775,7 @@ const newPage = () => {
                                                     <Col md={6}>
                                                         <Form.Label htmlFor="isGroup" className="form-label">Expense Approver</Form.Label>
                                                         <Dropdown onSelect={handleDropDownCreateNew}>
-                                                            <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Holiday List" readOnly>
+                                                            <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="" readOnly>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
                                                                 <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
@@ -743,7 +791,7 @@ const newPage = () => {
                                                     <Col md={6}>
                                                         <Form.Label htmlFor="isGroup" className="form-label">Shift Request Approver</Form.Label>
                                                         <Dropdown onSelect={handleDropDownCreateNew}>
-                                                            <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="Select Holiday List" readOnly>
+                                                            <Dropdown.Toggle as="input" className="form-control rounded-end flag-input form-select" placeholder="" readOnly>
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu as='ul' className="list-unstyled w-100 dropdown-menu-list mb-0">
                                                                 <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
@@ -1166,7 +1214,7 @@ const newPage = () => {
                         </Col>
 
                         <Col className="col-12">
-                            <Button variant='primary' className='btn-sm' type="submit">Submit form</Button>
+                            <Button onClick={handleSubmit} variant='primary' className='btn-sm' type="submit">Submit form</Button>
                         </Col>
                     </Form>
                 </Container>

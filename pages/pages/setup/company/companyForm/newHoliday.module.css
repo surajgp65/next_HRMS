@@ -3,13 +3,13 @@
   /* Add other styles for your footer content as needed */
   .footer {
     position: sticky;
+    height: 0.4rem;
     bottom: 0;
     width: 100%; /* Take the entire width of the parent */
     background-color: white;
-    opacity: 0.6;
     display: flex;
     align-items: center;
-    padding: 5px 20px; /* Adjust padding as needed */
+    /* padding: 5px 20px;  */
     z-index: 100;
   }
   
@@ -19,5 +19,5 @@
     justify-content: flex-end;
     align-items: center;
     width: 100%;
-    padding: 10px 20px;
+    /* padding: 10px 20px; */
   }
