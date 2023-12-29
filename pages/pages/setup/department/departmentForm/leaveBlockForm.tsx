@@ -19,17 +19,19 @@ import { ToastSuccess } from "@common/toast";
 
 const initialState = {
   hrms_company_id: "",
-  cost_center_name: "",
-  parent_cost_center: "",
+  leave_block_list_name: "",
+  hrms_company_leave_type_id: "",
 };
 
-const PayrollForm = () => {
+const LeaveBlockForm = () => {
   const router = useRouter();
 
   const [validated, setValidated] = useState(false);
   const [companyDetailsList, setCompanyDetailsList] = useState([]);
-  const [payRollData, setPayRollData] = useState(initialState);
+  const [leaveTypeList, setLeaveTypeList] = useState([]);
+  const [leaveBlock, setLeaveBlock] = useState(initialState);
   const [selectedCompanyData, setSelectedCompanyData] = useState<any>({});
+  const [selectedLeaveType, setSelectedLeaveType] = useState<any>({});
 
   useEffect(() => {
     getCompanyDetails();
@@ -41,10 +43,10 @@ const PayrollForm = () => {
     const form = event.currentTarget;
 
     try {
-      const bodyData = payRollData;
+      const bodyData = leaveBlock;
 
       await axiosInstance
-        .post("/setup/department/new_payroll_center", bodyData)
+        .post("/setup/department/new_blockleave", bodyData)
         .then((res: any) => {
           if (res.status === 200) {
             ToastSuccess(res.data.message);
@@ -74,26 +76,48 @@ const PayrollForm = () => {
   const handleCreateNewCompany = () => {
     router.push("/pages/setup/company/companyForm/companyForm");
   };
+  const handleCreateNewLeaveType = () => {
+    router.push("/pages/setup/department/departmentForm/leaveType");
+  };
 
   const selectCompanyData = (name: any, value: any) => {
     setSelectedCompanyData(value);
+    getLeaveType(value.hrms_company_id);
+    setLeaveBlock((prev: any) => ({ ...prev, [name]: value.hrms_company_id }));
+  };
 
-    setPayRollData((prev: any) => ({ ...prev, [name]: value.hrms_company_id }));
+  const selectLeaveType = (name: any, value: any) => {
+    setSelectedLeaveType(value);
+    setLeaveBlock((prev: any) => ({ ...prev, [name]: value.id }));
   };
 
   const handelInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value }: any = event.target;
-    setPayRollData((data) => ({ ...data, [name]: value }));
+    setLeaveBlock((data) => ({ ...data, [name]: value }));
+  };
+
+  const getLeaveType = async (id: any) => {
+    await axiosInstance
+      .get("/setup/department/list_of_leave_type/" + id)
+      .then((res: any) => {
+        if (res.status === 200) {
+          setLeaveTypeList(res.data.data);
+        }
+      })
+      .catch((error) => {});
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>New Cost Center</title>
+        <title>New Leave Block List</title>
       </Head>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumb breadcrumb="Pages" breadcrumbItem="New Cost Center" />
+          <Breadcrumb
+            breadcrumb="Pages"
+            breadcrumbItem="New Leave Block List"
+          />
 
           {/* Form */}
 
@@ -104,36 +128,24 @@ const PayrollForm = () => {
             onSubmit={handleSubmit}
           >
             <Row className="mb-3">
-              <Form.Group as={Col} md="6" controlId="validationCustom03">
-                <Form.Label>Cost Center Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="cost_center_name"
-                  value={payRollData.cost_center_name}
-                  onChange={handelInputChange}
-                  placeholder=""
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Please provide a valid value.
-                </Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group as={Col} md="6" controlId="validationCustom03">
-                <Form.Label>Parent Cost Center</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="parent_cost_center"
-                  value={payRollData.parent_cost_center}
-                  onChange={handelInputChange}
-                  placeholder=""
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Please provide a valid leave type
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row>
-            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group controlId="validationCustom03">
+                  <Form.Label>
+                    Leave Block List Name <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="leave_block_list_name"
+                    value={leaveBlock.leave_block_list_name}
+                    onChange={handelInputChange}
+                    placeholder=""
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please provide a valid value.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
               <Col md={6}>
                 <Form.Label htmlFor="isGroup" className="form-label">
                   Company
@@ -177,33 +189,54 @@ const PayrollForm = () => {
                   </Dropdown.Menu>
                 </Dropdown>
               </Col>
-              <Col md={4}>
-                <div className="mb-3">
-                  <InputGroup>
-                    <Form.Check
-                      type="checkbox"
-                      className="col-xs-2"
-                      id="isGroup"
-                    />
-                    <span style={{ height: "5px", width: "5px" }}></span>
-                    <Form.Label htmlFor="isGroup" className="form-label">
-                      Is Group
-                    </Form.Label>
-                  </InputGroup>
-                </div>
-                <div className="mb-3">
-                  <InputGroup>
-                    <Form.Check
-                      type="checkbox"
-                      className="col-xs-2"
-                      id="isGroup"
-                    />
-                    <span style={{ height: "5px", width: "5px" }}></span>
-                    <Form.Label htmlFor="isGroup" className="form-label">
-                      Disable
-                    </Form.Label>
-                  </InputGroup>
-                </div>
+            </Row>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Label htmlFor="isGroup" className="form-label">
+                  Leave Type
+                </Form.Label>
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder="Select Leave Type"
+                    name="hrms_company_leave_type_id"
+                    value={selectedLeaveType.leave_type_name}
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {leaveTypeList.length > 0 ? (
+                        leaveTypeList.map((x: any, index: any) => (
+                          <Dropdown.Item
+                            key={index}
+                            onClick={() => {
+                              selectLeaveType("hrms_company_leave_type_id", x);
+                            }}
+                            name={"hrms_company_leave_type_id" + index}
+                          >
+                            {x.leave_type_name}
+                          </Dropdown.Item>
+                        ))
+                      ) : (
+                        <Dropdown.Item disabled>Select Company</Dropdown.Item>
+                      )}
+                      <Dropdown.Divider></Dropdown.Divider>
+
+                      <Dropdown.Item onClick={handleCreateNewLeaveType}>
+                        <div className="d-flex justify-content-center align-items-center text-primary">
+                          <span
+                            className="bx bx-plus-medical"
+                            style={{ padding: 3 }}
+                          ></span>
+                          Create New Leave type
+                        </div>
+                      </Dropdown.Item>
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
               </Col>
             </Row>
 
@@ -221,8 +254,8 @@ const PayrollForm = () => {
   );
 };
 
-PayrollForm.getLayout = (page: ReactElement) => {
+LeaveBlockForm.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
 
-export default PayrollForm;
+export default LeaveBlockForm;

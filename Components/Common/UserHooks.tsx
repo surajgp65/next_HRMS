@@ -9,13 +9,12 @@ const useProfile = () => {
   );
 
   useEffect(() => {
-    const userProfileSession = getLoggedinUser();
-    setUserProfile(userProfileSession ? userProfileSession : null);
-    setLoading(userProfileSession ? false : true);
+    // const userProfileSession = getLoggedinUser();
+    // setUserProfile(userProfileSession ? userProfileSession : null);
+    // setLoading(userProfileSession ? false : true);
   }, []);
 
-
-  return { userProfile, loading};
+  return { userProfile, loading };
 };
 
 export { useProfile };

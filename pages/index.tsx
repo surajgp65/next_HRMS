@@ -13,17 +13,11 @@ export default function Index() {
   const { userProfile, loading } = useProfile();
 
   useEffect(() => {
-    if (!userProfile && loading) {
-      
-    }
-  }, [userProfile, loading, dispatch]);
-
-  useEffect(() => {
-    if (!userProfile && loading) {
-      router.push("/auth/login");
-    } else {
-      router.push("/dashboard");
-    }
+    // if (!userProfile && loading) {
+    //   router.push("/auth/login");
+    // } else {
+    // }
+    router.push("/dashboard");
   }, [router, loading, userProfile]);
 
 }

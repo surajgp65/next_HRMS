@@ -14,6 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".", // This must be specified if "paths" is.
+    
     "paths": {
       "@component/*": ["Components/views/*"],
       "@common/*": ["Components/Common/*"],

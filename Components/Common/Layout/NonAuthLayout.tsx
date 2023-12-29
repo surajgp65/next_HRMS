@@ -20,7 +20,7 @@ const NonAuthLayout = ({children} : NonAuthLayoutProps) => {
       };
 
       useEffect(() => {
-        redirectLoginFunction();
+        // redirectLoginFunction();
       },[])
     return (
         <React.Fragment>
