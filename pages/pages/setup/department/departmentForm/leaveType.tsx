@@ -53,10 +53,9 @@ const LeaveTypeForm = () => {
       }
 
       console.log(bodyData);
-      return;
 
       await axiosInstance
-        .post("/setup/department/new_leave_type", bodyData)
+        .post("/setup/department/leave_type", bodyData)
         .then((res: any) => {
           if (res.status === 200) {
             ToastSuccess(res.data.message);

@@ -146,6 +146,7 @@ const BranchList = () => {
   };
 
   const openPopUp = (data: any) => {
+    console.log(data);
     setmodal_grid(true);
     setBranchData(data);
     setIsEdit(true);
@@ -155,19 +156,28 @@ const BranchList = () => {
     event.preventDefault();
     event.stopPropagation();
 
+    const bodyData = branchData;
+    console.log(bodyData);
+
     try {
       await axiosInstance
         .put(
           "/setup/branch/update_branch/" + branchData.hrms_company_branch_id,
-          branchData
+          bodyData
         )
         .then((res: any) => {
           if (res.status === 200) {
             let data = res.data.data;
+            let value = {
+              branch_name: data.branch_name,
+              hrms_company_id: data.hrms_company_id,
+            };
+
+            console.log(value);
             setBranchList((prev: any) =>
               prev.map((x: any) =>
                 x.hrms_company_branch_id === data.hrms_company_branch_id
-                  ? { ...x, branch_name: data.branch_name }
+                  ? { ...x, value }
                   : x
               )
             );
@@ -289,7 +299,6 @@ const BranchList = () => {
                     placeholder="Select Company"
                     value={selectedCompanyData.company_name}
                     name="hrms_company_id"
-                    required
                   ></Dropdown.Toggle>
                   <Dropdown.Menu
                     as="ul"

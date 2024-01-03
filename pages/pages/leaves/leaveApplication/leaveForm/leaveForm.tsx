@@ -13,28 +13,137 @@ import Breadcrumb from "@common/Breadcrumb";
 import Layout from "@common/Layout";
 import { useRouter } from "next/router";
 import Flatpickr from "react-flatpickr";
+import { changeDateFormat, keyNullManipulation } from "@common/commonFunction";
+import axiosInstance from "lib/api";
+import SimpleBar from "simplebar-react";
+import { ToastSuccess } from "@common/toast";
+
+const today = changeDateFormat(Date.now());
+
+const initialState = {
+  hrms_company_leave_type_id: "",
+  hrms_company_employee_id: "",
+  hrms_company_letter_head_id: "",
+  hrms_company_id: "",
+  leave_approver_id: "",
+  series: "",
+  from_date: today,
+  to_date: today,
+  reason: "",
+  status: "",
+  approved_on: "",
+};
+
+const leaveStatus = ["open", "approved", "rejected", "cancelled"];
+
+const initialSelected = {
+  hrms_company_employee_id: {},
+  hrms_company_leave_type_id: {},
+  hrms_company_id: {},
+};
 
 const LeaveForm = () => {
   const router = useRouter();
 
   const [validated, setValidated] = useState(false);
+  const [leaveApplicationData, setLeaveApplicationData] =
+    useState(initialState);
+  const [leaveTypeList, setLeaveTypeList] = useState<any[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<any>({});
+  const [companyList, setCompanyList] = useState<any[]>([]);
+  const [selectedData, setSelectedData] = useState<any>(initialSelected);
+  const [employeeList, setEmployeeList] = useState<any[]>([]);
 
-  const handleSubmit = (event: any) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
+  useEffect(() => {
+    getCompanyDetails();
+    getEmployees();
+  }, []);
 
-    setValidated(true);
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      let bodyData = keyNullManipulation(leaveApplicationData);
+
+      if (
+        !bodyData.hrms_company_id ||
+        !bodyData.hrms_company_leave_type_id ||
+        !bodyData.leave_approver_id ||
+        !bodyData.from_date ||
+        !bodyData.to_date
+      ) {
+        setValidated(true);
+      }
+
+      console.log("submit -->", bodyData);
+
+      await axiosInstance
+        .post("/leave/leave application/add_leave_application", bodyData)
+        .then((res: any) => {
+          if (res.status === 200) {
+            ToastSuccess(res.data.message);
+            setLeaveApplicationData(initialState);
+            setSelectedData(initialSelected);
+            router.push("/pages/leaves/leaveApplication/leaveList");
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
   };
 
-  // Date
-  const date: any = new Date();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  const todaysDate = date.getDate();
-  const currentDate = todaysDate + "-" + month + "-" + year;
+  const getLeaveType = async (id: any) => {
+    try {
+      await axiosInstance
+        .get("/setup/department/list_of_leave_type/" + id)
+        .then((res: any) => {
+          if (res.status === 200) {
+            setLeaveTypeList(res.data.data);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const getCompanyDetails = async () => {
+    try {
+      await axiosInstance
+        .get("setup/company/list_of_companies")
+        .then((response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            console.log(data);
+            setCompanyList(data);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const setAllData = (name: any, value: any, data?: any, isDate?: boolean) => {
+    if (data) {
+      setSelectedData((prev: any) => ({ ...prev, [name]: data }));
+    }
+    if (isDate) {
+      value = changeDateFormat(value);
+    }
+
+    setLeaveApplicationData((prev: any) => ({ ...prev, [name]: value }));
+    console.log("selectedData -->", selectedData);
+  };
+
+  const getEmployees = async () => {
+    try {
+      await axiosInstance
+        .get("/employee/employeedetails/list_of_employees")
+        .then((res: any) => {
+          if (res.status === 200) {
+            setEmployeeList(res.data.data);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
 
   return (
     <React.Fragment>
@@ -44,30 +153,149 @@ const LeaveForm = () => {
       <div className="page-content">
         <Container fluid={true}>
           <Breadcrumb breadcrumb="Pages" breadcrumbItem="Leave Application" />
-
-          {/* Form */}
-
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
+          <Form
+            noValidate
+            validated={validated}
+            autoComplete="off"
+            onSubmit={handleSubmit}
+          >
+            <Row className="mb-2">
+              <Col md={6}>
+                <Form.Label htmlFor="isGroup" className="form-label">
+                  Company<span className="text-danger">*</span>
+                </Form.Label>
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder="Select Company"
+                    value={selectedData?.hrms_company_id?.company_name}
+                    defaultValue={selectedData?.hrms_company_id?.company_name}
+                    name="hrms_company_id"
+                    required
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {(companyList || []).map((x: any, index: any) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => {
+                            setAllData("hrms_company_id", x.hrms_company_id, x);
+                            getLeaveType(x.hrms_company_id);
+                          }}
+                          name={"hrms_company_id" + index}
+                        >
+                          {x.company_name}
+                        </Dropdown.Item>
+                      ))}
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Col>
+            </Row>
             <Row className="mb-3">
               <Form.Group as={Col} md="6" controlId="validationCustom03">
-                <Form.Label>Series</Form.Label>
-                <Form.Control type="text" placeholder="Series" required />
+                <Form.Label>
+                  Series<span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="series"
+                  onChange={(e) => {
+                    setAllData("series", e.target.value);
+                  }}
+                  value={leaveApplicationData.series}
+                  placeholder=""
+                  required
+                />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid series.
                 </Form.Control.Feedback>
               </Form.Group>
               <Form.Group as={Col} md="6" controlId="validationCustom03">
-                <Form.Label>Leave Type</Form.Label>
-                <Form.Control type="text" placeholder="" required />
-                <Form.Control.Feedback type="invalid">
-                  Please provide a valid leave type
-                </Form.Control.Feedback>
+                <Form.Label>
+                  Leave Type <span className="text-danger">*</span>
+                </Form.Label>
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder=""
+                    name="hrms_company_leave_type_id"
+                    value={
+                      selectedData?.hrms_company_leave_type_id?.leave_type_name
+                    }
+                    defaultValue={
+                      selectedData?.hrms_company_leave_type_id?.leave_type_name
+                    }
+                    required
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {leaveTypeList.length > 0 ? (
+                        leaveTypeList.map((x: any, index: any) => (
+                          <Dropdown.Item
+                            key={index}
+                            name={"hrms_company_leave_type_id" + index}
+                            onClick={() => {
+                              setAllData("hrms_company_leave_type_id", x.id, x);
+                            }}
+                          >
+                            {x.leave_type_name}
+                          </Dropdown.Item>
+                        ))
+                      ) : (
+                        <Dropdown.Item disabled>Select Company</Dropdown.Item>
+                      )}
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
               </Form.Group>
             </Row>
             <Row className="mb-3">
               <Form.Group as={Col} md="6" controlId="validationCustom03">
                 <Form.Label>Employee</Form.Label>
-                <Form.Control type="text" placeholder="" required />
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder="Select Employee"
+                    value={selectedData?.hrms_company_employee_id?.first_name}
+                    defaultValue={
+                      selectedData?.hrms_company_employee_id?.first_name
+                    }
+                    name="hrms_company_employee_id"
+                    required
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {(employeeList || []).map((x: any, index: any) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => {
+                            setAllData(
+                              "hrms_company_employee_id",
+                              x.hrms_company_employee_id,
+                              x
+                            );
+                          }}
+                          name={"hrms_company_employee_id" + index}
+                        >
+                          {x.first_name + " " + x.last_name}
+                        </Dropdown.Item>
+                      ))}
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid field.
                 </Form.Control.Feedback>
@@ -81,8 +309,15 @@ const LeaveForm = () => {
                   className="form-control"
                   options={{
                     dateFormat: "d-m-Y",
-                    defaultDate: [currentDate],
+                    defaultDate: "today",
+                    minDate: "today",
                   }}
+                  name="from_date"
+                  value={leaveApplicationData.from_date}
+                  onChange={(e: any) => {
+                    setAllData("from_date", e[0], null, true);
+                  }}
+                  required
                 />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid Date.
@@ -95,24 +330,36 @@ const LeaveForm = () => {
                   className="form-control"
                   options={{
                     dateFormat: "d-m-Y",
+                    minDate: "today",
                   }}
+                  name="to_date"
+                  value={leaveApplicationData.to_date}
+                  onChange={(e: any) => {
+                    setAllData("to_date", e[0], null, true);
+                  }}
+                  required
                 />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid Date.
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-            <Col xxl={3} md={6}>
+            <Col md={6}>
               <Form.Group>
                 <Form.Label>Reason</Form.Label>
                 <textarea
                   className="form-control"
                   id="exampleFormControlTextarea5"
                   rows={4}
+                  name="reason"
+                  value={leaveApplicationData.reason}
+                  onChange={(e) => {
+                    setAllData("reason", e.target.value);
+                  }}
                 ></textarea>
               </Form.Group>
             </Col>
-            <Form.Group className="mb-3">
+            <Form.Group className="mt-3">
               <Form.Check label="Halfday" />
             </Form.Group>
 
@@ -122,22 +369,77 @@ const LeaveForm = () => {
             <Row className="mb-3">
               <Form.Group as={Col} md="6" controlId="validationCustom03">
                 <Form.Label>Leave Approver</Form.Label>
-                <Form.Control type="text" placeholder="Series" required />
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder="Select Employee"
+                    value={selectedData?.leave_approver_id?.first_name}
+                    defaultValue={selectedData?.leave_approver_id?.first_name}
+                    name="hrms_company_employee_id"
+                    required
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {(employeeList || []).map((x: any, index: any) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => {
+                            setAllData(
+                              "leave_approver_id",
+                              x.hrms_company_employee_id,
+                              x
+                            );
+                          }}
+                          name={"leave_approver_id" + index}
+                        >
+                          {x.first_name + " " + x.last_name}
+                        </Dropdown.Item>
+                      ))}
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid Name.
                 </Form.Control.Feedback>
               </Form.Group>
               <Form.Group as={Col} md="6" controlId="validationCustom03">
                 <Form.Label>Status</Form.Label>
-                <Form.Select id="datalistOptions">
-                  <option value="1">Open</option>
-                  <option value="2">Approved</option>
-                  <option value="3">Rejected</option>
-                  <option value="4">Cancelled</option>
-                </Form.Select>
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder=""
+                    name="status"
+                    value={leaveApplicationData?.status}
+                    defaultValue={leaveApplicationData.status}
+                    required
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {leaveStatus.map((x: any, index: any) => (
+                        <Dropdown.Item
+                          key={index}
+                          name={"status" + index}
+                          onClick={() => {
+                            setAllData("status", x);
+                          }}
+                        >
+                          {x}
+                        </Dropdown.Item>
+                      ))}
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
               </Form.Group>
             </Row>
-            <Row className="mb-3">
+            {/* <Row className="mb-3">
               <Col></Col>
               <Form.Group as={Col} md="6" controlId="validationCustom03">
                 <Form.Label>Salary slip</Form.Label>
@@ -146,12 +448,12 @@ const LeaveForm = () => {
                   Please provide a valid salary slip
                 </Form.Control.Feedback>
               </Form.Group>
-            </Row>
+            </Row> */}
 
             {/* Divider scdsadada*/}
             <hr className="hr-blurry" />
 
-            <Button type="submit" className="btn-sm" variant="success">
+            <Button type="submit" className="btn-sm" variant="primary">
               Submit form
             </Button>
           </Form>

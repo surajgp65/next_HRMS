@@ -1,15 +1,27 @@
-import React, { ReactElement, useState, useMemo } from "react";
+import React, { ReactElement, useState, useMemo, useEffect } from "react";
 import Head from "next/head";
-import { Container } from "react-bootstrap";
+import { Container, Dropdown, Form } from "react-bootstrap";
 import Breadcrumb from "@common/Breadcrumb";
 import Layout from "@common/Layout";
 import { Card, Row, Col, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import TableContainer from "@common/TableContainer";
+import axiosInstance from "lib/api";
+import SimpleBar from "simplebar-react";
+
+const initialState = {};
 
 const LeaveList = () => {
   const router = useRouter();
   const [userRole, setUserRole] = useState("Hr");
+  const [leaveApplication, setLeaveApplication] = useState(initialState);
+  const [leaveList, setLeaveList] = useState<any[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<any>({});
+  const [companyList, setCompanyList] = useState<any[]>([]);
+
+  useEffect(() => {
+    getCompanyDetails();
+  }, []);
 
   const handleAddButtonClick = () => {
     if (userRole === "Hr") {
@@ -21,60 +33,6 @@ const LeaveList = () => {
       // You can redirect them to a different page or show an error message
     }
   };
-
-  // Data for the Table
-  const staticData = [
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-
-    // Add more objects as needed
-  ];
 
   // Table Headers and populating cells
 
@@ -111,7 +69,11 @@ const LeaveList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.employeeName;
+          return (
+            cellProps?.hrms_company_employee_id?.first_name +
+            " " +
+            cellProps?.hrms_company_employee_id?.last_name
+          );
         },
       },
       {
@@ -119,7 +81,7 @@ const LeaveList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.status;
+          return cellProps.status.toUpperCase();
         },
       },
       {
@@ -127,12 +89,49 @@ const LeaveList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.fromDate;
+          return cellProps.from_date;
+        },
+      },
+      {
+        Header: "To Date",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return cellProps.to_date;
         },
       },
     ],
     []
   );
+
+  const getCompanyDetails = async () => {
+    try {
+      await axiosInstance
+        .get("setup/company/list_of_companies")
+        .then((response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            console.log(data);
+            setCompanyList(data);
+            setSelectedCompany(data[0]);
+            getLeaveList(data[0].hrms_company_id);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const getLeaveList = async (id: any) => {
+    try {
+      await axiosInstance
+        .get("/leave/leave application/list_all_leave_application/" + id)
+        .then((res: any) => {
+          if (res.status === 200) {
+            setLeaveList(res.data.data);
+          }
+        });
+    } catch (error) {}
+  };
 
   return (
     <React.Fragment>
@@ -158,12 +157,53 @@ const LeaveList = () => {
             <Col lg={12}>
               <Card id="apiKeyList">
                 <Card.Header className="d-flex align-items-center">
-                  <h5 className="card-title flex-grow-1 mb-0">Company List</h5>
+                  <h5 className="card-title flex-grow-1 mb-0">Leave List</h5>
+                  <form action="#" autoComplete="off">
+                    <Row>
+                      <Col md={12}>
+                        {/* <Form.Label htmlFor="isGroup" className="form-label">
+                          Company
+                        </Form.Label> */}
+                        <Dropdown>
+                          <Dropdown.Toggle
+                            as="input"
+                            className="form-control rounded-end flag-input form-select"
+                            placeholder="Select Company"
+                            value={selectedCompany?.company_name}
+                            defaultValue={selectedCompany?.company_name}
+                            name="hrms_company_id"
+                          ></Dropdown.Toggle>
+                          <Dropdown.Menu
+                            as="ul"
+                            className="list-unstyled w-100 dropdown-menu-list mb-0"
+                          >
+                            <SimpleBar
+                              style={{ maxHeight: "220px" }}
+                              className="px-3"
+                            >
+                              {(companyList || []).map((x: any, index: any) => (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() => {
+                                    getLeaveList(x.hrms_company_id);
+                                    setSelectedCompany(x);
+                                  }}
+                                  name={"hrms_company_id" + index}
+                                >
+                                  {x.company_name}
+                                </Dropdown.Item>
+                              ))}
+                            </SimpleBar>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Col>
+                    </Row>
+                  </form>
                 </Card.Header>
                 <Card.Body>
                   <TableContainer
                     columns={columns || []}
-                    data={staticData || []}
+                    data={leaveList || []}
                     isPagination={true}
                     isGlobalFilter={true}
                     iscustomPageSize={false}

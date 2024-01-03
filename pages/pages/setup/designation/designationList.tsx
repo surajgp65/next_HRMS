@@ -306,7 +306,6 @@ const DesignationList = () => {
                       placeholder="Select Company"
                       value={selectedCompanyData.company_name}
                       name="hrms_company_id"
-                      required
                     ></Dropdown.Toggle>
                     <Dropdown.Menu
                       as="ul"

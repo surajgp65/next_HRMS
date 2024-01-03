@@ -1,74 +1,30 @@
-import React, { ReactElement, useState, useMemo } from "react";
+import React, { ReactElement, useState, useMemo, useEffect } from "react";
 import Head from "next/head";
 import Breadcrumb from "@common/Breadcrumb";
 import Layout from "@common/Layout";
-import { Card, Col, Button, Row, Container } from "react-bootstrap";
+import { Card, Col, Button, Row, Container, Dropdown } from "react-bootstrap";
 import TableContainer from "@common/TableContainer";
 
 import { useRouter } from "next/router";
+import SimpleBar from "simplebar-react";
+import axiosInstance from "lib/api";
 
 const compensatoryLeaveList = () => {
   const router = useRouter();
+
+  const [selectedCompany, setSelectedCompany] = useState<any>({});
+  const [companyList, setCompanyList] = useState<any[]>([]);
+  const [compensatoryLeaves, setCompensatoryLeaves] = useState<any[]>([]);
+
+  useEffect(() => {
+    getCompanyDetails();
+  }, []);
 
   const handleAddButtonClick = () => {
     router.push(
       "/pages/leaves/compensatoryLeaveApp/compensatoryForm/compensatoryForm"
     );
   };
-
-  // Data for the Table
-  const staticData = [
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anaab Raut",
-      status: "Approved",
-      fromDate: "12-10-2023",
-    },
-    {
-      id: 2,
-      employeeName: "Anurag Shetty",
-      status: "Rejected",
-      fromDate: "12-10-2023",
-    },
-
-    // Add more objects as needed
-  ];
 
   // Table Headers and populating cells
 
@@ -105,7 +61,11 @@ const compensatoryLeaveList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.employeeName;
+          return (
+            cellProps?.hrms_company_employee_id?.first_name +
+            " " +
+            cellProps?.hrms_company_employee_id?.last_name
+          );
         },
       },
       {
@@ -121,12 +81,49 @@ const compensatoryLeaveList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.fromDate;
+          return cellProps.work_from_date;
+        },
+      },
+      {
+        Header: "To Date",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return cellProps.work_end_date;
         },
       },
     ],
     []
   );
+
+  const getCompLeave = async (id: any) => {
+    console.log(id);
+    try {
+      await axiosInstance
+        .get("/leave/leave applicationlist_compensatory_leave_request/" + id)
+        .then((res: any) => {
+          if (res.status === 200) {
+            setCompensatoryLeaves(res.data.data);
+          }
+        });
+    } catch (error) {}
+  };
+
+  const getCompanyDetails = async () => {
+    try {
+      await axiosInstance
+        .get("setup/company/list_of_companies")
+        .then((response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+
+            setCompanyList(data);
+            setSelectedCompany(data[0]);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
 
   return (
     <React.Fragment>
@@ -158,11 +155,52 @@ const compensatoryLeaveList = () => {
                   <h5 className="card-title flex-grow-1 mb-0">
                     Compensatory Leave List
                   </h5>
+                  <form action="#" autoComplete="off">
+                    <Row>
+                      <Col md={12}>
+                        {/* <Form.Label htmlFor="isGroup" className="form-label">
+                          Company
+                        </Form.Label> */}
+                        <Dropdown>
+                          <Dropdown.Toggle
+                            as="input"
+                            className="form-control rounded-end flag-input form-select"
+                            placeholder="Select Company"
+                            value={selectedCompany?.company_name}
+                            defaultValue={selectedCompany?.company_name}
+                            name="hrms_company_id"
+                          ></Dropdown.Toggle>
+                          <Dropdown.Menu
+                            as="ul"
+                            className="list-unstyled w-100 dropdown-menu-list mb-0"
+                          >
+                            <SimpleBar
+                              style={{ maxHeight: "220px" }}
+                              className="px-3"
+                            >
+                              {(companyList || []).map((x: any, index: any) => (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() => {
+                                    getCompLeave(x.hrms_company_id);
+                                    setSelectedCompany(x);
+                                  }}
+                                  name={"hrms_company_id" + index}
+                                >
+                                  {x.company_name}
+                                </Dropdown.Item>
+                              ))}
+                            </SimpleBar>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Col>
+                    </Row>
+                  </form>
                 </Card.Header>
                 <Card.Body>
                   <TableContainer
                     columns={columns || []}
-                    data={staticData || []}
+                    data={compensatoryLeaves || []}
                     isPagination={true}
                     isGlobalFilter={true}
                     iscustomPageSize={false}

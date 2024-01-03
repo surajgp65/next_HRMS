@@ -158,6 +158,12 @@ const companyHistoryInitial = {
   to_date: "",
 };
 
+const employeeGrade = {
+  hrms_company_employee_id: "",
+  name: "",
+  default_salary_structure: "",
+};
+
 const EmployeeForm = () => {
   const router = useRouter();
   const editorRef = useRef<any>();
@@ -176,6 +182,7 @@ const EmployeeForm = () => {
   const [educationModal, setEducationModal] = useState(false);
   const [workExpModal, setWorkExpModal] = useState(false);
   const [historyModal, setHistoryModal] = useState(false);
+  const [employeeGradeModal, setemployeeGradeModal] = useState(false);
   const [employmentType, setEmploymentType] = useState(initialEmploymentType);
   const [selectedCompany, setSelectedCompany] = useState<any>({});
   const [employeeList, setEmployeeList] = useState<any[]>([]);
@@ -225,7 +232,6 @@ const EmployeeForm = () => {
         .post("/employee/employeedetails/add_employee_overview", bodyData)
         .then((res: any) => {
           if (res.status === 200) {
-            console.log("response -->", res.data.data);
             ToastSuccess(res.data.message);
           }
         });
@@ -251,8 +257,6 @@ const EmployeeForm = () => {
       if (data) {
         setSelectedData((prev: any) => ({ ...prev, [name]: data }));
       }
-
-      console.log(employeeData);
     } else {
       setEmployeeData((prev: any) => ({ ...prev, [name]: value }));
     }
@@ -285,36 +289,6 @@ const EmployeeForm = () => {
       console.log(selectedValue);
     }
   };
-
-  // Education Table
-  const staticData = [
-    {
-      id: "Salt-Tech Software Services LLP",
-      country: "India",
-      createDate: "2023-10-09",
-      parentCompany: "",
-    },
-    {
-      id: "Salt-Tech Software Services LLP",
-      country: "India",
-      createDate: "2023-10-09",
-      parentCompany: "",
-    },
-    {
-      id: "Salt-Tech Software Services LLP",
-      country: "India",
-      createDate: "2023-10-09",
-      parentCompany: "",
-    },
-    {
-      id: "Salt-Tech Software Services LLP",
-      country: "India",
-      createDate: "2023-10-09",
-      parentCompany: "",
-    },
-
-    // Add more objects as needed
-  ];
 
   const columns = useMemo(
     () => [
@@ -535,9 +509,7 @@ const EmployeeForm = () => {
             setCompanyDetails(response?.data?.data);
           }
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch((error) => {});
 
       await axiosInstance
         .get("/setup/designation/list_of_designation")
@@ -601,7 +573,6 @@ const EmployeeForm = () => {
   };
 
   const selectDropdownData = (name: any, value: any, data: any) => {
-    console.log(name, "--->", value, data);
     setSelectedData((prev: any) => ({ ...prev, [name]: data }));
     setEmployeeData((prev: any) => ({ ...prev, [name]: value }));
   };
@@ -684,6 +655,18 @@ const EmployeeForm = () => {
     setEducationData(educationInitial);
     setWorkExperience(workExperiencesInitial);
     setCompanyHistoryData(companyHistoryInitial);
+  };
+
+  const createEmployeeGrade = async () => {
+    try {
+      await axiosInstance
+        .post("/employee/employeedetails/add_employee_grade", null)
+        .then((res: any) => {
+          if (res.status === 200) {
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
   };
 
   return (
@@ -3442,6 +3425,98 @@ const EmployeeForm = () => {
         </Modal.Body>
       </Modal>
       <Modal
+        show={employeeGradeModal}
+        onHide={() => {
+          setemployeeGradeModal(false);
+        }}
+      >
+        <Modal.Header className="modal-title fw-bold">
+          Employment Type
+        </Modal.Header>
+        <Modal.Body>
+          <form action="#" onSubmit={createEmployeeGrade} autoComplete="off">
+            <div className="row g-3">
+              <Col md={6}>
+                <Form.Label htmlFor="isGroup" className="form-label">
+                  Company<span className="text-danger">*</span>
+                </Form.Label>
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="input"
+                    className="form-control rounded-end flag-input form-select"
+                    placeholder="Select Company"
+                    value={selectedCompany?.company_name}
+                    defaultValue={selectedCompany?.company_name}
+                    name="hrms_company_id"
+                  ></Dropdown.Toggle>
+                  <Dropdown.Menu
+                    as="ul"
+                    className="list-unstyled w-100 dropdown-menu-list mb-0"
+                  >
+                    <SimpleBar style={{ maxHeight: "220px" }} className="px-3">
+                      {(companyDetails || []).map((x: any, index: any) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => {
+                            setSelectedCompany(x);
+                          }}
+                          name={"hrms_company_id" + index}
+                        >
+                          {x.company_name}
+                        </Dropdown.Item>
+                      ))}
+                    </SimpleBar>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Col>
+              <Col md={12}>
+                <div>
+                  <Form.Label
+                    htmlFor="employment_type_name"
+                    className="form-label"
+                  >
+                    Employment Type
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    className="form-control"
+                    id="employment_type_name"
+                    name="employment_type_name"
+                    value={employmentType.employment_type_name}
+                    onChange={(e) =>
+                      employmentTypeInputChange(
+                        "employment_type_name",
+                        e.target.value,
+                        data
+                      )
+                    }
+                    placeholder=""
+                  />
+                </div>
+              </Col>
+
+              <Col md={6}></Col>
+              <Col lg={12}>
+                <div className="hstack gap-2 justify-content-end">
+                  <Button
+                    variant="light"
+                    onClick={() => {
+                      setmodal_grid(false);
+                    }}
+                  >
+                    Close
+                  </Button>
+                  <Button variant="primary" type="submit">
+                    Add
+                  </Button>
+                </div>
+              </Col>
+            </div>
+          </form>
+        </Modal.Body>
+      </Modal>
+
+      <Modal
         show={educationModal}
         onHide={() => {
           setEducationModal(false);
@@ -3733,7 +3808,6 @@ const EmployeeForm = () => {
                   name="hrms_company_employee_branch_id"
                   value={companyHistoryData.branch}
                   onChange={(e) => {
-                    console.log(e.target.value);
                     inputHistoryDetails("branch", e.target.value, null);
                   }}
                   placeholder=""
