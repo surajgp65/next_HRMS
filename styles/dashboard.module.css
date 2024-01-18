@@ -1,0 +1,8 @@
+.dashBoard_list {
+  border: none !important;
+  cursor: pointer;
+}
+.dashBoard_list:hover {
+  background: whitesmoke;
+  transition: 0.3s ease-in-out;
+}

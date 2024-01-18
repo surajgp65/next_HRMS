@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useMemo } from "react";
+import React, { ReactElement, useState, useMemo, useEffect } from "react";
 import Head from "next/head";
 import Breadcrumb from "@common/Breadcrumb";
 import Layout from "@common/Layout";
@@ -11,53 +11,25 @@ import {
   Modal,
   Form,
   Container,
+  Dropdown,
 } from "react-bootstrap";
 import TableContainer from "@common/TableContainer";
+import axiosInstance from "lib/api";
+import SimpleBar from "simplebar-react";
+import { useDispatch } from "react-redux";
+import { updateAttendance } from "Components/slices/attendance/reducer";
 
 const AttendanceList = () => {
   const router = useRouter();
+  const dispatch: any = useDispatch();
 
-  // Data for the Table
-  const staticData = [
-    {
-      id: 1,
-      employeeName: "Anurag",
-      status: "Present",
-      attendanceDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anurag",
-      status: "Work from home",
-      attendanceDate: "13-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anurag",
-      status: "Present",
-      attendanceDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anurag",
-      status: "Work from home",
-      attendanceDate: "13-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anurag",
-      status: "Present",
-      attendanceDate: "12-10-2023",
-    },
-    {
-      id: 1,
-      employeeName: "Anurag",
-      status: "Work from home",
-      attendanceDate: "13-10-2023",
-    },
+  const [attendanceList, setAttendanceList] = useState<any[]>([]);
+  const [companyList, setCompanyList] = useState<any[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<any>({});
 
-    // Add more objects as needed
-  ];
+  useEffect(() => {
+    getCompanyDetails();
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -84,7 +56,15 @@ const AttendanceList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.id;
+          return <></>;
+        },
+      },
+      {
+        Header: "Series",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return cellProps?.series;
         },
       },
       {
@@ -92,7 +72,11 @@ const AttendanceList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.employeeName;
+          return (
+            cellProps?.hrms_company_employee_id?.first_name +
+            " " +
+            cellProps?.hrms_company_employee_id?.last_name
+          );
         },
       },
       {
@@ -108,15 +92,68 @@ const AttendanceList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.attendanceDate;
+          return cellProps.attendance_date;
+        },
+      },
+      {
+        Header: "Action",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                sendReducerData(cellProps);
+              }}
+            >
+              <i className="ri-pencil-line"></i>
+            </div>
+          );
         },
       },
     ],
     []
   );
 
-  const handleAddButtonClick = () => {
+  const sendReducerData = (data: any) => {
+    data.isEdit = true;
+    dispatch(updateAttendance(data));
     router.push("/pages/attendance/attendance/attendanceForm/attendanceForm");
+  };
+
+  const handleAddButtonClick = () => {
+    dispatch(updateAttendance({ isEdit: false }));
+    router.push("/pages/attendance/attendance/attendanceForm/attendanceForm");
+  };
+
+  const getAttendanceList = async (id: any) => {
+    try {
+      await axiosInstance
+        .get("/attendance/attendance/list_of_employee_attendance/" + id)
+        .then((res: any) => {
+          if (res.status === 200) {
+            let data = res.data.data;
+            setAttendanceList(data);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const getCompanyDetails = async () => {
+    try {
+      await axiosInstance
+        .get("setup/company/list_of_companies")
+        .then((response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            setCompanyList(data);
+            getAttendanceList(data[0].hrms_company_id);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
   };
 
   return (
@@ -148,11 +185,51 @@ const AttendanceList = () => {
                   <h5 className="card-title flex-grow-1 mb-0">
                     Attendance List
                   </h5>
+                  <form action="#" autoComplete="off">
+                    <Row>
+                      <Col md={12}>
+                        {/* <Form.Label htmlFor="isGroup" className="form-label">
+                          Company
+                        </Form.Label> */}
+                        <Dropdown>
+                          <Dropdown.Toggle
+                            as="input"
+                            className="form-control rounded-end flag-input form-select"
+                            placeholder="Select Company"
+                            value={selectedCompany?.company_name}
+                            defaultValue={selectedCompany?.company_name}
+                            name="hrms_company_id"
+                          ></Dropdown.Toggle>
+                          <Dropdown.Menu
+                            as="ul"
+                            className="list-unstyled w-100 dropdown-menu-list mb-0"
+                          >
+                            <SimpleBar
+                              style={{ maxHeight: "220px" }}
+                              className="px-3"
+                            >
+                              {(companyList || []).map((x: any, index: any) => (
+                                <Dropdown.Item
+                                  key={index}
+                                  onClick={() => {
+                                    getAttendanceList(x.hrms_company_id);
+                                    setSelectedCompany(x);
+                                  }}
+                                >
+                                  {x.company_name}
+                                </Dropdown.Item>
+                              ))}
+                            </SimpleBar>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Col>
+                    </Row>
+                  </form>
                 </Card.Header>
                 <Card.Body>
                   <TableContainer
                     columns={columns || []}
-                    data={staticData || []}
+                    data={attendanceList || []}
                     isPagination={true}
                     isGlobalFilter={true}
                     iscustomPageSize={false}

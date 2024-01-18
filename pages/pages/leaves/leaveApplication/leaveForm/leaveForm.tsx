@@ -17,6 +17,7 @@ import { changeDateFormat, keyNullManipulation } from "@common/commonFunction";
 import axiosInstance from "lib/api";
 import SimpleBar from "simplebar-react";
 import { ToastSuccess } from "@common/toast";
+import { useSelector } from "react-redux";
 
 const today = changeDateFormat(Date.now());
 
@@ -54,10 +55,35 @@ const LeaveForm = () => {
   const [selectedData, setSelectedData] = useState<any>(initialSelected);
   const [employeeList, setEmployeeList] = useState<any[]>([]);
 
+  const { leave } = useSelector((state: any) => ({
+    leave: state?.Leave?.leave,
+  }));
+
   useEffect(() => {
     getCompanyDetails();
     getEmployees();
+    getReducerData();
   }, []);
+
+  const getReducerData = () => {
+    let leaveData: any = {};
+    leaveData = leave;
+
+    for (const key in leaveData) {
+      if (typeof leaveData[key] === "object" && leaveData[key] !== null) {
+        setSelectedData((prev: any) => ({ ...prev, [key]: leaveData[key] }));
+        setLeaveApplicationData((prev: any) => ({
+          ...prev,
+          [key]: leaveData[key][key],
+        }));
+      } else {
+        setLeaveApplicationData((prev: any) => ({
+          ...prev,
+          [key]: leaveData[key],
+        }));
+      }
+    }
+  };
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -75,8 +101,6 @@ const LeaveForm = () => {
       ) {
         setValidated(true);
       }
-
-      console.log("submit -->", bodyData);
 
       await axiosInstance
         .post("/leave/leave application/add_leave_application", bodyData)
@@ -112,7 +136,6 @@ const LeaveForm = () => {
         .then((response: any) => {
           if (response.status == 200) {
             let data = response.data.data;
-            console.log(data);
             setCompanyList(data);
           }
         })
@@ -127,9 +150,7 @@ const LeaveForm = () => {
     if (isDate) {
       value = changeDateFormat(value);
     }
-
     setLeaveApplicationData((prev: any) => ({ ...prev, [name]: value }));
-    console.log("selectedData -->", selectedData);
   };
 
   const getEmployees = async () => {
@@ -139,6 +160,39 @@ const LeaveForm = () => {
         .then((res: any) => {
           if (res.status === 200) {
             setEmployeeList(res.data.data);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const updateLeaveApplication = async (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      let bodyData = leaveApplicationData;
+
+      console.log("update -->", bodyData);
+      // return;
+      if (
+        !bodyData.hrms_company_id ||
+        !bodyData.hrms_company_leave_type_id ||
+        !bodyData.leave_approver_id ||
+        !bodyData.from_date ||
+        !bodyData.to_date
+      ) {
+        setValidated(true);
+      }
+
+      await axiosInstance
+        .put("/leave/leave application/update_leave_application", bodyData)
+        .then((res: any) => {
+          if (res.status === 200) {
+            ToastSuccess(res.data.message);
+            setLeaveApplicationData(initialState);
+            setSelectedData(initialSelected);
+            router.push("/pages/leaves/leaveApplication/leaveList");
           }
         })
         .catch((error) => {});
@@ -157,7 +211,7 @@ const LeaveForm = () => {
             noValidate
             validated={validated}
             autoComplete="off"
-            onSubmit={handleSubmit}
+            onSubmit={leave.isEdit ? updateLeaveApplication : handleSubmit}
           >
             <Row className="mb-2">
               <Col md={6}>
@@ -186,7 +240,6 @@ const LeaveForm = () => {
                             setAllData("hrms_company_id", x.hrms_company_id, x);
                             getLeaveType(x.hrms_company_id);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>
@@ -242,7 +295,6 @@ const LeaveForm = () => {
                         leaveTypeList.map((x: any, index: any) => (
                           <Dropdown.Item
                             key={index}
-                            name={"hrms_company_leave_type_id" + index}
                             onClick={() => {
                               setAllData("hrms_company_leave_type_id", x.id, x);
                             }}
@@ -288,7 +340,6 @@ const LeaveForm = () => {
                               x
                             );
                           }}
-                          name={"hrms_company_employee_id" + index}
                         >
                           {x.first_name + " " + x.last_name}
                         </Dropdown.Item>
@@ -394,7 +445,6 @@ const LeaveForm = () => {
                               x
                             );
                           }}
-                          name={"leave_approver_id" + index}
                         >
                           {x.first_name + " " + x.last_name}
                         </Dropdown.Item>
@@ -426,7 +476,6 @@ const LeaveForm = () => {
                       {leaveStatus.map((x: any, index: any) => (
                         <Dropdown.Item
                           key={index}
-                          name={"status" + index}
                           onClick={() => {
                             setAllData("status", x);
                           }}
@@ -454,7 +503,7 @@ const LeaveForm = () => {
             <hr className="hr-blurry" />
 
             <Button type="submit" className="btn-sm" variant="primary">
-              Submit form
+              {leave.isEdit ? "Update" : " Submit "}
             </Button>
           </Form>
         </Container>

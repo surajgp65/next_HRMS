@@ -201,6 +201,16 @@ const Navdata = () => {
           parentId: "setup",
           stateVariables: isDesignation,
         },
+        // {
+        //   id: "holidayList",
+        //   label: "Holiday List",
+        //   link: "/pages/setup/holidays/holidayList",
+        //   click: function (e: any) {
+        //     e.preventDefault();
+        //   },
+        //   parentId: "setup",
+        //   stateVariables: isDesignation,
+        // },
       ],
     },
     {
@@ -279,6 +289,17 @@ const Navdata = () => {
           id: "compLeaveReq",
           label: "Compensatory Leave Request",
           link: "/pages/leaves/compensatoryLeaveApp/compensatoryLeaveList",
+          click: function (e: any) {
+            e.preventDefault();
+            setIsCompLeaveReq(!isCompLeaveReq);
+          },
+          parentId: "leaves",
+          stateVariables: isCompLeaveReq,
+        },
+        {
+          id: "leaveStructure",
+          label: "Leave Structure",
+          link: "/pages/leaves/leaveStructure/leaveStructureList",
           click: function (e: any) {
             e.preventDefault();
             setIsCompLeaveReq(!isCompLeaveReq);

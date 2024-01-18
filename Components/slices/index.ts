@@ -23,12 +23,12 @@ import ProfileReducer from "./auth/profile/reducer";
 import GroupReducer from "./group/reducer";
 import CompanyReducer from "./company/reducer";
 import BranchReducer from "./branch/reducer";
+import LeaveReducer from "./leaves/reducer";
+import LeaveStructureReducer from "./leaveStructure/reducer";
+import AttendanceReducer from "./attendance/reducer";
 
 const combinedReducer = combineReducers({
   Layout: LayoutReducer,
-  // Calendar: calendarSlice,
-  // APIKey: APIKeyslice,
-  // Contacts: contactslice,
   Login: LoginReducer,
   Account: AccountReducer,
   ForgetPassword: ForgetPasswordReducer,
@@ -36,8 +36,9 @@ const combinedReducer = combineReducers({
   Group: GroupReducer,
   Company: CompanyReducer,
   Branch: BranchReducer,
-  // Team: teamslice,
-  // Dashboard: dashboardslice
+  Leave: LeaveReducer,
+  LeaveStructure: LeaveStructureReducer,
+  Attendance: AttendanceReducer,
 });
 
 const reducer = (state: any, action: AnyAction) => {

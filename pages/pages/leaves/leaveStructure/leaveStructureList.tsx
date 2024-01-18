@@ -9,34 +9,20 @@ import TableContainer from "@common/TableContainer";
 import axiosInstance from "lib/api";
 import SimpleBar from "simplebar-react";
 import { useDispatch } from "react-redux";
-import { updateLeave } from "Components/slices/leaves/reducer";
+import { updateLeaveStructure } from "Components/slices/leaveStructure/reducer";
 
 const initialState = {};
 
-const LeaveList = () => {
+const LeaveStructureList = () => {
   const router = useRouter();
   const dispatch: any = useDispatch();
-  const [userRole, setUserRole] = useState("Hr");
-  const [leaveApplication, setLeaveApplication] = useState(initialState);
-  const [leaveList, setLeaveList] = useState<any[]>([]);
-  const [selectedCompany, setSelectedCompany] = useState<any>({});
   const [companyList, setCompanyList] = useState<any[]>([]);
+  const [leaveStructureList, setLeaveStructureList] = useState<any[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<any>({});
 
   useEffect(() => {
     getCompanyDetails();
   }, []);
-
-  const handleAddButtonClick = () => {
-    dispatch(updateLeave({ isEdit: false }));
-    if (userRole === "Hr") {
-      router.push("/pages/leaves/leaveApplication/leaveForm/leaveForm");
-    } else if (userRole === "Employee") {
-      router.push("/pages/leaves/leaveApplication/leaveForm/employeeLeaveForm");
-    } else {
-      // Handle other roles or unauthorized users as needed
-      // You can redirect them to a different page or show an error message
-    }
-  };
 
   // Table Headers and populating cells
 
@@ -65,45 +51,34 @@ const LeaveList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.id;
+          return cellProps.structure_name;
         },
       },
       {
-        Header: "Employee Name",
+        Header: "Structure",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return (
-            cellProps?.hrms_company_employee_id?.first_name +
-            " " +
-            cellProps?.hrms_company_employee_id?.last_name
-          );
+          return cellProps?.structure_name;
         },
       },
       {
-        Header: "Status",
+        Header: "Credited",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.status.toUpperCase();
+          return cellProps.credited;
         },
       },
       {
-        Header: "From Date",
+        Header: "Total Leaves",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.from_date;
+          return cellProps.total_no_of_leaves;
         },
       },
-      {
-        Header: "To Date",
-        disableFilters: true,
-        filterable: true,
-        accessor: (cellProps: any) => {
-          return cellProps.to_date;
-        },
-      },
+
       {
         Header: "Action",
         disableFilters: true,
@@ -127,8 +102,17 @@ const LeaveList = () => {
 
   const sendReduxData = (data: any) => {
     data.isEdit = true;
-    dispatch(updateLeave(data));
-    router.push("/pages/leaves/leaveApplication/leaveForm/leaveForm");
+    dispatch(updateLeaveStructure(data));
+    router.push(
+      "/pages/leaves/leaveStructure/leaveStructureForm/leaveStructureForm"
+    );
+  };
+
+  const handleAddButtonClick = () => {
+    dispatch(updateLeaveStructure({ isEdit: false }));
+    router.push(
+      "/pages/leaves/leaveStructure/leaveStructureForm/leaveStructureForm"
+    );
   };
 
   const getCompanyDetails = async () => {
@@ -140,20 +124,22 @@ const LeaveList = () => {
             let data = response.data.data;
             setCompanyList(data);
             setSelectedCompany(data[0]);
-            getLeaveList(data[0].hrms_company_id);
+            getLeaveStructure(data[0]);
           }
         })
         .catch((error) => {});
     } catch (error) {}
   };
 
-  const getLeaveList = async (id: any) => {
+  const getLeaveStructure = async (data: any) => {
     try {
       await axiosInstance
-        .get("/leave/leave application/list_all_leave_application/" + id)
+        .get(
+          "/setup/department/list_comp_leave_structure/" + data.hrms_company_id
+        )
         .then((res: any) => {
           if (res.status === 200) {
-            setLeaveList(res.data.data);
+            setLeaveStructureList(res.data.data);
           }
         });
     } catch (error) {}
@@ -162,11 +148,11 @@ const LeaveList = () => {
   return (
     <React.Fragment>
       <Head>
-        <title>Leave List</title>
+        <title>Leave Structure</title>
       </Head>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumb breadcrumb="Pages" breadcrumbItem="Leave List" />
+          <Breadcrumb breadcrumb="Pages" breadcrumbItem="Leave Structure" />
           <div className="text-end m-2">
             <Button
               type="submit"
@@ -174,7 +160,7 @@ const LeaveList = () => {
               className="btn-sm"
               onClick={handleAddButtonClick}
             >
-              Add Leave Application
+              Add Leave Structure
             </Button>
           </div>
 
@@ -211,8 +197,8 @@ const LeaveList = () => {
                                 <Dropdown.Item
                                   key={index}
                                   onClick={() => {
-                                    getLeaveList(x.hrms_company_id);
                                     setSelectedCompany(x);
+                                    getLeaveStructure(x);
                                   }}
                                 >
                                   {x.company_name}
@@ -228,7 +214,7 @@ const LeaveList = () => {
                 <Card.Body>
                   <TableContainer
                     columns={columns || []}
-                    data={leaveList || []}
+                    data={leaveStructureList || []}
                     isPagination={true}
                     isGlobalFilter={true}
                     iscustomPageSize={false}
@@ -237,7 +223,7 @@ const LeaveList = () => {
                     className="custom-header-css table align-middle table-nowrap"
                     tableClassName="table-centered align-middle table-nowrap mb-0"
                     theadClassName="text-muted table-light"
-                    SearchPlaceholder="Search Employee or Leave..."
+                    SearchPlaceholder="Search Leave Structure..."
                   />
                   <div className="noresult" style={{ display: "none" }}>
                     <div className="text-center">
@@ -259,8 +245,8 @@ const LeaveList = () => {
   );
 };
 
-LeaveList.getLayout = (page: ReactElement) => {
+LeaveStructureList.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
 
-export default LeaveList;
+export default LeaveStructureList;

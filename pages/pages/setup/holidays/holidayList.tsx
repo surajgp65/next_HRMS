@@ -2,31 +2,47 @@ import React, { ReactElement, useState, useMemo, useEffect } from "react";
 import Head from "next/head";
 import Breadcrumb from "@common/Breadcrumb";
 import Layout from "@common/Layout";
-import { Card, Col, Button, Row, Container } from "react-bootstrap";
-import TableContainer from "@common/TableContainer";
-
 import { useRouter } from "next/router";
+import Link from "next/link";
+import {
+  Card,
+  Col,
+  Row,
+  Button,
+  Modal,
+  Form,
+  Container,
+  Dropdown,
+} from "react-bootstrap";
+import TableContainer from "@common/TableContainer";
 import axiosInstance from "lib/api";
+import { toast, ToastContainer } from "react-toastify";
+import { ToastSuccess } from "@common/toast";
+import SimpleBar from "simplebar-react";
+import { useDispatch } from "react-redux";
+import { updateHoliday } from "Components/slices/company/reducer";
 
-const EmployeeList = () => {
+const initialState = {
+  designation: "",
+  hrms_company_designation_id: null,
+  hrms_company_id: null,
+};
+
+const HolidayList = () => {
   const router = useRouter();
-  const [employeeList, setEmployeeList] = useState<any[]>([]);
+  const dispatch: any = useDispatch();
+  const [modal_grid, setmodal_grid] = useState(false);
+  const [holidayList, setHolidayList] = useState<any[]>([]);
 
   useEffect(() => {
-    getEmployees();
+    getHolidayList();
   }, []);
-
-  const handleAddButtonClick = () => {
-    router.push("/pages/employee/employeeDetails/employeeForm/employeeForm");
-  };
-
-  // Table Headers and populating cells
 
   const columns = useMemo(
     () => [
       {
         id: "#",
-        Header: "",
+        Header: "#",
         disableFilters: true,
         filterable: false,
         accessor: (cellProps: any) => {
@@ -47,65 +63,80 @@ const EmployeeList = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.id;
+          return cellProps.holiday_list_name;
         },
       },
       {
-        Header: "Full Name",
+        Header: "Holiday name",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.first_name + " " + cellProps.last_name;
+          return cellProps.holiday_list_name;
         },
       },
       {
-        Header: "Designation",
+        Header: "Action",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.designation;
-        },
-      },
-      {
-        Header: "Status",
-        disableFilters: true,
-        filterable: true,
-        accessor: (cellProps: any) => {
-          return cellProps.status;
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                sendReducerData(cellProps);
+              }}
+            >
+              <i className="ri-pencil-line"></i>
+            </div>
+          );
         },
       },
     ],
     []
   );
 
-  const getEmployees = async () => {
+  const goToHolidayForm = () => {
+    dispatch(updateHoliday({ idEdit: false }));
+    router.push("/pages/setup/company/companyForm/newHoliday");
+  };
+
+  const sendReducerData = (data: any) => {
+    data.isEdit = true;
+
+    console.log(data);
+    dispatch(updateHoliday(data));
+    router.push("/pages/setup/company/companyForm/newHoliday");
+  };
+
+  const getHolidayList = async () => {
     try {
       await axiosInstance
-        .get("/employee/employeedetails/list_of_employees")
+        .get("/setup/company/get_holidays")
         .then((res: any) => {
           if (res.status === 200) {
-            setEmployeeList(res.data.data);
+            setHolidayList(res.data.data);
           }
-        })
-        .catch((error) => {});
+        });
     } catch (error) {}
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>Employee List</title>
+        <title>Holiday List</title>
       </Head>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumb breadcrumb="Pages" breadcrumbItem="Employee" />
+          <Breadcrumb breadcrumb="Pages" breadcrumbItem="" />
           <div className="text-end m-2">
             <Button
-              type="button"
               className="btn-sm"
-              onClick={handleAddButtonClick}
+              variant="primary"
+              onClick={goToHolidayForm}
             >
-              <i className="ri-add-line align-bottom me-1"></i>Add New Employee
+              <div className="d-flex justify-content-center align-items-center">
+                <i className="ri-add-line align-bottom me-1"></i>Add new Holiday
+              </div>
             </Button>
           </div>
 
@@ -114,12 +145,12 @@ const EmployeeList = () => {
             <Col lg={12}>
               <Card id="apiKeyList">
                 <Card.Header className="d-flex align-items-center">
-                  <h5 className="card-title flex-grow-1 mb-0">Employee List</h5>
+                  <h5 className="card-title flex-grow-1 mb-0">Holiday List</h5>
                 </Card.Header>
                 <Card.Body>
                   <TableContainer
                     columns={columns || []}
-                    data={employeeList || []}
+                    data={holidayList || []}
                     isPagination={true}
                     isGlobalFilter={true}
                     iscustomPageSize={false}
@@ -128,7 +159,7 @@ const EmployeeList = () => {
                     className="custom-header-css table align-middle table-nowrap"
                     tableClassName="table-centered align-middle table-nowrap mb-0"
                     theadClassName="text-muted table-light"
-                    SearchPlaceholder="Search Employee..."
+                    SearchPlaceholder="Search Holiday..."
                   />
                   <div className="noresult" style={{ display: "none" }}>
                     <div className="text-center">
@@ -150,8 +181,8 @@ const EmployeeList = () => {
   );
 };
 
-EmployeeList.getLayout = (page: ReactElement) => {
+HolidayList.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
 
-export default EmployeeList;
+export default HolidayList;

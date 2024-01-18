@@ -22,6 +22,7 @@ import { useRouter } from "next/router";
 import axiosInstance from "../../../../lib/api";
 import { updateCompany } from "Components/slices/company/reducer";
 import { useDispatch } from "react-redux";
+import { ToastSuccess } from "@common/toast";
 
 const CompanyList = () => {
   const router = useRouter();
@@ -46,21 +47,42 @@ const CompanyList = () => {
   };
 
   const handleAddButtonClick = () => {
+    dispatch(updateCompany({ isEdit: false }));
     router.push("/pages/setup/company/companyForm/companyForm");
   };
   const updateCompanyRoute = (data: any) => {
-    console.log("reducer data send--->", data);
+    data.isEdit = true;
     dispatch(updateCompany(data));
-
     router.push(
       `/pages/setup/company/companyForm/companyForm?companyId=${data.hrms_company_id}`
     );
+  };
+
+  const deleteCompany = async (data: any) => {
+    try {
+      await axiosInstance
+        .delete("/setup/company/delete_company/" + data.hrms_company_id)
+        .then((res: any) => {
+          ToastSuccess(res.message);
+          setCompanyDetails((prev: any) =>
+            prev.filter((x: any) => x.hrms_company_id !== data.hrms_company_id)
+          );
+        });
+    } catch (error) {}
   };
 
   const columns = useMemo(
     () => [
       {
         Header: "ID",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return cellProps.company_name;
+        },
+      },
+      {
+        Header: "Company",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
@@ -84,15 +106,30 @@ const CompanyList = () => {
         },
       },
       {
-        Header: "Action",
+        Header: "Edit",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
           return (
             <i
-              className="ri-pencil-line"
+              className="ri-pencil-line cursor-pointer"
               onClick={() => {
                 updateCompanyRoute(cellProps);
+              }}
+            ></i>
+          );
+        },
+      },
+      {
+        Header: "Delete",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return (
+            <i
+              className="ri-delete-bin-fill cursor-pointer"
+              onClick={() => {
+                deleteCompany(cellProps);
               }}
             ></i>
           );

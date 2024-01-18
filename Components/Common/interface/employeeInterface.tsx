@@ -21,6 +21,7 @@ export interface IEmployee {
   employee_personal: EmployeePersonal;
   employee_profile: EmployeeProfile;
   employee_exit: EmployeeExit;
+  employee_attendance_leaves: EmployeeAttendanceLeaves;
 }
 
 export interface EmployeeJoining {
@@ -42,6 +43,14 @@ export interface EmployeeAddressContacts {
   relation: string;
   emergency_phone: string;
   permanent_address: string;
+}
+export interface EmployeeAttendanceLeaves {
+  hrms_company_holiday_name_id: string;
+  hrms_company_shift_type_id: string;
+  biometric_id: string;
+  expense_approver_id: string;
+  leave_approver_id: string;
+  shift_approver_id: string;
 }
 
 export interface EmployeeSalary {

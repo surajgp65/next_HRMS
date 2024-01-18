@@ -131,8 +131,6 @@ const EmployeeGroupList = () => {
     try {
       let bodyData = groupData;
 
-      console.log("Group data", bodyData);
-      // return;
       await axiosInstance
         .post("/employee/employeegroup/add_employee_group", bodyData)
         .then((res: any) => {
@@ -251,7 +249,6 @@ const EmployeeGroupList = () => {
                               null
                             );
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>
@@ -286,7 +283,6 @@ const EmployeeGroupList = () => {
                         <Dropdown.Item
                           key={index}
                           onClick={() => {
-                            console.log(x);
                             setSelectedEmployee(x);
                             selectedSecondNameData(
                               "hrms_company_employee_id",
@@ -294,7 +290,6 @@ const EmployeeGroupList = () => {
                               null
                             );
                           }}
-                          name={"hrms_company_employee_id" + index}
                         >
                           {x.first_name + " " + x.last_name}
                         </Dropdown.Item>

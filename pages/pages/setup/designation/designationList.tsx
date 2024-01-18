@@ -88,10 +88,10 @@ const DesignationList = () => {
         accessor: (cellProps: any) => {
           return (
             <div
+              className="cursor-pointer"
               onClick={() => {
                 setmodal_grid(true);
                 setIsEdit(true);
-                console.log(cellProps);
                 setDesignationData(cellProps);
               }}
             >
@@ -109,7 +109,6 @@ const DesignationList = () => {
       axiosInstance
         .get("/setup/designation/list_of_designation")
         .then((res) => {
-          console.log("Designation -->", res);
           if (res.status === 200) setDesignationList(res.data.data);
         })
         .catch((error) => {});
@@ -123,8 +122,6 @@ const DesignationList = () => {
       await axiosInstance
         .post("/setup/designation/add_designation", designationData)
         .then((res) => {
-          console.log("desgination post --->", res);
-
           if (res.status === 200) {
             let data = res.data.data;
             ToastSuccess(res.data.message);
@@ -151,7 +148,6 @@ const DesignationList = () => {
         .then((res) => {
           if (res.status === 200) {
             let data = res.data.data;
-            console.log(res.data);
             toast.success(`${res.data.message}`, {
               position: toast.POSITION.TOP_RIGHT,
               autoClose: 3000,
@@ -322,7 +318,6 @@ const DesignationList = () => {
                               onClick={() => {
                                 selectCompanyData("hrms_company_id", x);
                               }}
-                              name={"hrms_company_id" + index}
                             >
                               {x.company_name}
                             </Dropdown.Item>

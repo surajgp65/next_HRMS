@@ -113,7 +113,7 @@ const DepartmentList = () => {
         filterable: true,
         accessor: (cellProps: any) => {
           return (
-            <div onClick={() => {}}>
+            <div className="cursor-pointer" onClick={() => {}}>
               <i className="ri-pencil-line"></i>
             </div>
           );

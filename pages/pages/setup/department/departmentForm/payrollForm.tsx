@@ -157,7 +157,6 @@ const PayrollForm = () => {
                           onClick={() => {
                             selectCompanyData("hrms_company_id", x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>

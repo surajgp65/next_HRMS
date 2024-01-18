@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 export const initialState = {
   company: "",
-  isEdit: false,
+  holiday: "",
   error: "",
   loading: false,
 };
@@ -17,12 +17,15 @@ const companySlice = createSlice({
     },
     updateCompany(state, action) {
       state.company = action.payload;
-      state.isEdit = true;
+      state.loading = false;
+    },
+    updateHoliday(state, action) {
+      state.holiday = action.payload;
       state.loading = false;
     },
   },
 });
 
-export const { apiError, updateCompany } = companySlice.actions;
+export const { apiError, updateCompany, updateHoliday } = companySlice.actions;
 
 export default companySlice.reducer;

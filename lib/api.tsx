@@ -3,7 +3,8 @@
 import axios from "axios";
 import { ToastContainer, toast, Slide } from "react-toastify";
 
-const baseURL = "http://192.168.0.37:8001/";
+// const baseURL = "http://192.168.0.33:8001/";
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 const getAccessToken = () => {
   return localStorage.getItem("accessToken");

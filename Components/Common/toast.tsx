@@ -13,7 +13,7 @@ const ToastSuccess = (data: any) => {
   });
 };
 const ToastError = (data: any) => {
-  toast.success(`${data}`, {
+  toast.error(`${data}`, {
     position: toast.POSITION.TOP_RIGHT,
     autoClose: 3000,
     hideProgressBar: false,

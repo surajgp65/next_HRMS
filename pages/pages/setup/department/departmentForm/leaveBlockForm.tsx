@@ -169,7 +169,6 @@ const LeaveBlockForm = () => {
                           onClick={() => {
                             selectCompanyData("hrms_company_id", x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>
@@ -215,7 +214,6 @@ const LeaveBlockForm = () => {
                             onClick={() => {
                               selectLeaveType("hrms_company_leave_type_id", x);
                             }}
-                            name={"hrms_company_leave_type_id" + index}
                           >
                             {x.leave_type_name}
                           </Dropdown.Item>

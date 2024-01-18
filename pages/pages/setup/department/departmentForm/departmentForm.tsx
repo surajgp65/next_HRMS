@@ -50,7 +50,6 @@ const DepartmentForm = () => {
 
     const bodyData = departmentData;
 
-    console.log(bodyData);
     try {
       await axiosInstance
         .post("/setup/department/add_department", bodyData)
@@ -101,7 +100,6 @@ const DepartmentForm = () => {
   };
 
   const selectCompanyData = (name: any, value: any) => {
-    console.log(value);
     setSelectedCompanyData(value);
     setDepartmentData((data) => ({ ...data, [name]: value.hrms_company_id }));
     getPayRollList(value.hrms_company_id);
@@ -203,7 +201,6 @@ const DepartmentForm = () => {
                           onClick={() => {
                             selectCompanyData("hrms_company_id", x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>

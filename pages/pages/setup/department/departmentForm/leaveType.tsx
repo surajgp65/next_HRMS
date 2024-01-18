@@ -52,8 +52,6 @@ const LeaveTypeForm = () => {
         return;
       }
 
-      console.log(bodyData);
-
       await axiosInstance
         .post("/setup/department/leave_type", bodyData)
         .then((res: any) => {
@@ -79,7 +77,6 @@ const LeaveTypeForm = () => {
   };
 
   const selectCompanyData = (name: any, value: any) => {
-    console.log(value);
     setSelectedCompanyData(value);
     setLeaveTypeData((prev: any) => ({
       ...prev,
@@ -147,7 +144,6 @@ const LeaveTypeForm = () => {
                           onClick={() => {
                             selectCompanyData("hrms_company_id", x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>

@@ -22,11 +22,14 @@ const initialState = {
   hrms_company_employee_id: "",
   name: "",
   default_salary_structure: "",
+  employee_grade_id: "",
 };
 
 const EmployeeGradeList = () => {
   const router = useRouter();
   const [modal_grid, setmodal_grid] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+
   function tog_grid() {
     setmodal_grid(!modal_grid);
   }
@@ -82,6 +85,25 @@ const EmployeeGradeList = () => {
           return cellProps.name;
         },
       },
+      {
+        Header: "Action",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                setEmployeeGrade(cellProps);
+                tog_grid();
+                setIsEdit(true);
+              }}
+            >
+              <i className="ri-pencil-line"></i>
+            </div>
+          );
+        },
+      },
     ],
     []
   );
@@ -134,6 +156,37 @@ const EmployeeGradeList = () => {
           }
         })
         .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const udpdateGrade = async (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      let bodyData = employeeGrade;
+
+      await axiosInstance
+        .put(
+          "/employee/employeedetails/update_emp_grade/" +
+            employeeGrade.employee_grade_id,
+          bodyData
+        )
+        .then((res: any) => {
+          if (res.status === 200) {
+            let data = res.data.data;
+            setEmployeeListGrade((prev: any) =>
+              prev.map((x: any) =>
+                x.employee_grade_id === data.employee_grade_id
+                  ? { ...x, ...data }
+                  : x
+              )
+            );
+            ToastSuccess(res.data.message);
+            setEmployeeGrade(initialState);
+            setIsEdit(false);
+            tog_grid();
+          }
+        });
     } catch (error) {}
   };
 
@@ -204,7 +257,11 @@ const EmployeeGradeList = () => {
           New Employee Group
         </Modal.Header>
         <Modal.Body>
-          <form action="#" onSubmit={submitGrade} autoComplete="off">
+          <form
+            action="#"
+            onSubmit={isEdit ? udpdateGrade : submitGrade}
+            autoComplete="off"
+          >
             <div className="row g-3">
               <Col xxl={6}>
                 <div>
@@ -247,7 +304,7 @@ const EmployeeGradeList = () => {
                     Close
                   </Button>
                   <Button variant="primary" type="submit">
-                    Add
+                    {isEdit ? "Update" : "Add"}
                   </Button>
                 </div>
               </Col>

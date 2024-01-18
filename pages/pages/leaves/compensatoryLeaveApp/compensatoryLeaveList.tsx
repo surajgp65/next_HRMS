@@ -8,9 +8,12 @@ import TableContainer from "@common/TableContainer";
 import { useRouter } from "next/router";
 import SimpleBar from "simplebar-react";
 import axiosInstance from "lib/api";
+import { updateCompLeave } from "Components/slices/leaves/reducer";
+import { useDispatch } from "react-redux";
 
-const compensatoryLeaveList = () => {
-  const router = useRouter();
+const CompensatoryLeaveList = () => {
+  const Router = useRouter();
+  const dispatch: any = useDispatch();
 
   const [selectedCompany, setSelectedCompany] = useState<any>({});
   const [companyList, setCompanyList] = useState<any[]>([]);
@@ -18,10 +21,11 @@ const compensatoryLeaveList = () => {
 
   useEffect(() => {
     getCompanyDetails();
-  }, []);
+  }, [Router]);
 
   const handleAddButtonClick = () => {
-    router.push(
+    dispatch(updateCompLeave({ idEdit: false }));
+    Router.push(
       "/pages/leaves/compensatoryLeaveApp/compensatoryForm/compensatoryForm"
     );
   };
@@ -92,12 +96,28 @@ const compensatoryLeaveList = () => {
           return cellProps.work_end_date;
         },
       },
+      {
+        Header: "Action",
+        disableFilters: true,
+        filterable: true,
+        accessor: (cellProps: any) => {
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                sendReducerData(cellProps);
+              }}
+            >
+              <i className="ri-pencil-line"></i>
+            </div>
+          );
+        },
+      },
     ],
     []
   );
 
   const getCompLeave = async (id: any) => {
-    console.log(id);
     try {
       await axiosInstance
         .get("/leave/leave applicationlist_compensatory_leave_request/" + id)
@@ -123,6 +143,11 @@ const compensatoryLeaveList = () => {
         })
         .catch((error) => {});
     } catch (error) {}
+  };
+
+  const sendReducerData = (data: any) => {
+    data.isEdit = true;
+    dispatch(updateCompLeave(data));
   };
 
   return (
@@ -185,7 +210,6 @@ const compensatoryLeaveList = () => {
                                     getCompLeave(x.hrms_company_id);
                                     setSelectedCompany(x);
                                   }}
-                                  name={"hrms_company_id" + index}
                                 >
                                   {x.company_name}
                                 </Dropdown.Item>
@@ -231,8 +255,8 @@ const compensatoryLeaveList = () => {
   );
 };
 
-compensatoryLeaveList.getLayout = (page: ReactElement) => {
+CompensatoryLeaveList.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
 
-export default compensatoryLeaveList;
+export default CompensatoryLeaveList;

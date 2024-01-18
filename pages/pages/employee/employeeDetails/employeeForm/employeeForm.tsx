@@ -52,6 +52,12 @@ const initialSelected = {
   employee_address_contacts: {},
   employee_personal: {},
   employee_salary: {},
+  hrms_company_holiday_name_id: {},
+  hrms_company_shift_type_id: {},
+  expense_approver_id: {},
+  hrms_company_employee_reports_to_id: {},
+  shift_approver_id: {},
+  leave_approver_id: {},
 };
 
 const initialEmploymentType = {
@@ -130,6 +136,14 @@ const initialEmployee = {
     reason_for_leaving: "",
     feedback: "",
   },
+  employee_attendance_leaves: {
+    hrms_company_holiday_name_id: "",
+    hrms_company_shift_type_id: "",
+    biometric_id: "",
+    expense_approver_id: "",
+    leave_approver_id: "",
+    shift_approver_id: "",
+  },
 };
 
 const educationInitial = {
@@ -197,6 +211,8 @@ const EmployeeForm = () => {
   const [companyHistoryData, setCompanyHistoryData] = useState(
     companyHistoryInitial
   );
+  const [holidayList, setHolidayList] = useState([]);
+  const [shiftList, setShiftList] = useState<any[]>([]);
 
   // Handle Input change
   const handleInputChange = (event: any) => {
@@ -228,6 +244,8 @@ const EmployeeForm = () => {
 
     try {
       let bodyData = keyNullManipulation(employeeData);
+      console.log(bodyData);
+
       await axiosInstance
         .post("/employee/employeedetails/add_employee_overview", bodyData)
         .then((res: any) => {
@@ -249,17 +267,23 @@ const EmployeeForm = () => {
       value = changeDateFormat(value);
     }
 
+    if (data) {
+      setSelectedData((prev: any) => ({ ...prev, [name]: data }));
+    }
+
     if (s_name) {
+      console.log(value);
       setEmployeeData((prev: any) => ({
         ...prev,
         [name]: { ...prev[name], [s_name]: value },
       }));
-      if (data) {
-        setSelectedData((prev: any) => ({ ...prev, [name]: data }));
-      }
     } else {
       setEmployeeData((prev: any) => ({ ...prev, [name]: value }));
     }
+  };
+
+  const setDropDownData = (name: any, data: any, s_name?: any) => {
+    setSelectedData((prev: any) => ({ ...prev, [s_name]: data }));
   };
 
   useEffect(() => {
@@ -270,10 +294,6 @@ const EmployeeForm = () => {
     setEditor(true);
     getAllData();
   }, []);
-
-  const changeActiveTab = (eventKey: any) => {
-    setActiveTab("joining");
-  };
 
   const tog_grid = () => {
     setmodal_grid(!modal_grid);
@@ -544,15 +564,6 @@ const EmployeeForm = () => {
         .catch((error) => {});
 
       await axiosInstance
-        .get("/employee/employeedetails/list_of_employees")
-        .then((res: any) => {
-          if (res.status === 200) {
-            setEmployeeList(res.data.data);
-          }
-        })
-        .catch((error) => {});
-
-      await axiosInstance
         .get("/employee/employeedetails/list_of_employee_grade")
         .then((res: any) => {
           if (res.status === 200) {
@@ -566,6 +577,34 @@ const EmployeeForm = () => {
         .then((res: any) => {
           if (res.status === 200) {
             setHealthInsuranceList(res.data.data);
+          }
+        })
+        .catch((error) => {});
+
+      await axiosInstance
+        .get("setup/company/get_holidays")
+        .then((res: any) => {
+          if (res.status === 200) setHolidayList(res.data.data);
+        })
+        .catch((error) => {});
+
+      await axiosInstance
+        .get("/attendance/attendance/list_shift_type")
+        .then((res: any) => {
+          if (res.status === 200) {
+            setShiftList(res.data.data);
+          }
+        });
+    } catch (error) {}
+  };
+
+  const getEmployeeList = async (id: any) => {
+    try {
+      await axiosInstance
+        .get("/employee/employeedetails/list_of_employees/" + id)
+        .then((res: any) => {
+          if (res.status === 200) {
+            setEmployeeList(res.data.data);
           }
         })
         .catch((error) => {});
@@ -701,11 +740,11 @@ const EmployeeForm = () => {
                           Address & Contacts
                         </Nav.Link>
                       </Nav.Item>
-                      {/* <Nav.Item as="li">
+                      <Nav.Item as="li">
                         <Nav.Link eventKey="Attendance">
                           Attendance & Leaves
                         </Nav.Link>
-                      </Nav.Item> */}
+                      </Nav.Item>
                       <Nav.Item as="li">
                         <Nav.Link eventKey="salary"> Salary </Nav.Link>
                       </Nav.Item>
@@ -1058,6 +1097,7 @@ const EmployeeForm = () => {
                                             x.hrms_company_id
                                           );
                                           getPayRollList(x.hrms_company_id);
+                                          getEmployeeList(x.hrms_company_id);
                                         }}
                                       >
                                         {x.company_name}
@@ -1289,6 +1329,16 @@ const EmployeeForm = () => {
                                 as="input"
                                 className="form-control rounded-end flag-input form-select"
                                 placeholder=""
+                                value={
+                                  selectedData
+                                    ?.hrms_company_employee_reports_to_id
+                                    ?.first_name
+                                }
+                                defaultValue={
+                                  selectedData
+                                    ?.hrms_company_employee_reports_to_id
+                                    ?.first_name
+                                }
                                 readOnly
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
@@ -1304,14 +1354,15 @@ const EmployeeForm = () => {
                                       <Dropdown.Item
                                         key={index}
                                         onClick={() =>
-                                          selectDropdownData(
+                                          selectedSecondNameData(
                                             "hrms_company_employee_reports_to_id",
                                             x.hrms_company_employee_id,
-                                            x
+                                            x,
+                                            null
                                           )
                                         }
                                       >
-                                        {x.hrms_company_employee_id}
+                                        {x.first_name}
                                       </Dropdown.Item>
                                     )
                                   )}
@@ -1907,7 +1958,7 @@ const EmployeeForm = () => {
                                     (x: any, index: any) => (
                                       <Dropdown.Item
                                         id={x}
-                                        name={x}
+                                        key={index}
                                         onClick={(e: any) => {
                                           selectedSecondNameData(
                                             "employee_address_contacts",
@@ -2059,18 +2110,28 @@ const EmployeeForm = () => {
                       </Tab.Pane>
 
                       {/* Attendance */}
-                      {/* <Tab.Pane eventKey="Attendance" id="Attendance">
+                      <Tab.Pane eventKey="Attendance" id="Attendance">
                         <Row className="mb-3">
                           <Col md={6}>
                             <Form.Label
-                              htmlFor="validationDefault01"
+                              htmlFor="biometric_id"
                               className="form-label"
                             >
                               Attendance Device ID (Biometric/RF tag ID)
                             </Form.Label>
                             <Form.Control
                               type="text"
-                              id="validationDefault01"
+                              id="biometric_id"
+                              name="biometric_id"
+                              onChange={(e) => {
+                                selectedSecondNameData(
+                                  "employee_attendance_leaves",
+                                  e.target.value,
+                                  null,
+                                  null,
+                                  "biometric_id"
+                                );
+                              }}
                             />
                           </Col>
                           <Col md={6}>
@@ -2080,12 +2141,19 @@ const EmployeeForm = () => {
                             >
                               Holiday List
                             </Form.Label>
-                            <Dropdown onSelect={handleDropDownCreateNew}>
+                            <Dropdown>
                               <Dropdown.Toggle
                                 as="input"
                                 className="form-control rounded-end flag-input form-select"
-                                placeholder=""
-                                readOnly
+                                value={
+                                  selectedData?.hrms_company_holiday_name_id
+                                    ?.holiday_list_name
+                                }
+                                defaultValue={
+                                  selectedData?.hrms_company_holiday_name_id
+                                    ?.holiday_list_name
+                                }
+                                name="hrms_company_holiday_name_id"
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
                                 as="ul"
@@ -2095,23 +2163,27 @@ const EmployeeForm = () => {
                                   style={{ maxHeight: "220px" }}
                                   className="px-3"
                                 >
-                                  <Dropdown.Item eventKey="abc">
-                                    Option 1
-                                  </Dropdown.Item>
-                                  <Dropdown.Item eventKey="option2">
-                                    Option 2
-                                  </Dropdown.Item>
-                                  <Dropdown.Divider></Dropdown.Divider>
-
-                                  <Dropdown.Item eventKey="holiday">
-                                    <div className="d-flex justify-content-center align-items-center text-primary">
-                                      <span
-                                        className="bx bx-plus-medical"
-                                        style={{ padding: 3 }}
-                                      ></span>
-                                      Create new Holiday
-                                    </div>
-                                  </Dropdown.Item>
+                                  {holidayList.map((x: any, index) => (
+                                    <Dropdown.Item
+                                      key={index}
+                                      onClick={() => {
+                                        selectedSecondNameData(
+                                          "employee_attendance_leaves",
+                                          x.id,
+                                          x,
+                                          null,
+                                          "hrms_company_holiday_name_id"
+                                        );
+                                        setDropDownData(
+                                          "employee_attendance_leaves",
+                                          x,
+                                          "hrms_company_holiday_name_id"
+                                        );
+                                      }}
+                                    >
+                                      {x.holiday_list_name}
+                                    </Dropdown.Item>
+                                  ))}
                                 </SimpleBar>
                               </Dropdown.Menu>
                             </Dropdown>
@@ -2123,14 +2195,55 @@ const EmployeeForm = () => {
                             >
                               Default Shift
                             </Form.Label>
-                            <Form.Control
-                              type="text"
-                              id="validationDefault01"
-                            />
+                            <Dropdown aria-required>
+                              <Dropdown.Toggle
+                                as="input"
+                                className="form-control rounded-end flag-input form-select"
+                                placeholder=""
+                                value={
+                                  selectedData.hrms_company_shift_type_id
+                                    .shift_type_name
+                                }
+                                defaultValue={
+                                  selectedData.hrms_company_shift_type_id
+                                    .shift_type_name
+                                }
+                              ></Dropdown.Toggle>
+                              <Dropdown.Menu
+                                as="ul"
+                                className="list-unstyled w-100 dropdown-menu-list mb-0"
+                              >
+                                <SimpleBar
+                                  style={{ maxHeight: "220px" }}
+                                  className="px-3"
+                                >
+                                  {shiftList.map((x: any, index: any) => (
+                                    <Dropdown.Item
+                                      key={index}
+                                      onClick={() => {
+                                        selectedSecondNameData(
+                                          "employee_attendance_leaves",
+                                          x.id,
+                                          null,
+                                          null,
+                                          "hrms_company_shift_type_id"
+                                        );
+                                        setDropDownData(
+                                          "employee_attendance_leaves",
+                                          x,
+                                          "hrms_company_shift_type_id"
+                                        );
+                                      }}
+                                    >
+                                      {x.shift_type_name}
+                                    </Dropdown.Item>
+                                  ))}
+                                </SimpleBar>
+                              </Dropdown.Menu>
+                            </Dropdown>
                           </Col>
                         </Row>
 
-                      
                         <div className="border-top my-3"></div>
                         <Card.Subtitle>Approvers</Card.Subtitle>
 
@@ -2142,11 +2255,17 @@ const EmployeeForm = () => {
                             >
                               Expense Approver
                             </Form.Label>
-                            <Dropdown onSelect={handleDropDownCreateNew}>
+                            <Dropdown>
                               <Dropdown.Toggle
                                 as="input"
                                 className="form-control rounded-end flag-input form-select"
                                 placeholder=""
+                                value={
+                                  selectedData?.expense_approver_id?.first_name
+                                }
+                                defaultValue={
+                                  selectedData?.expense_approver_id?.first_name
+                                }
                                 readOnly
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
@@ -2157,23 +2276,29 @@ const EmployeeForm = () => {
                                   style={{ maxHeight: "220px" }}
                                   className="px-3"
                                 >
-                                  <Dropdown.Item eventKey="abc">
-                                    Employee 1
-                                  </Dropdown.Item>
-                                  <Dropdown.Item eventKey="option2">
-                                    Employee 2
-                                  </Dropdown.Item>
-                                  <Dropdown.Divider></Dropdown.Divider>
-
-                                  <Dropdown.Item eventKey="user">
-                                    <div className="d-flex justify-content-center align-items-center text-primary">
-                                      <span
-                                        className="bx bx-plus-medical"
-                                        style={{ padding: 3 }}
-                                      ></span>
-                                      Create a new user
-                                    </div>
-                                  </Dropdown.Item>
+                                  {(employeeList || []).map(
+                                    (x: any, index: any) => (
+                                      <Dropdown.Item
+                                        key={index}
+                                        onClick={() => {
+                                          selectedSecondNameData(
+                                            "employee_attendance_leaves",
+                                            x.hrms_company_employee_id,
+                                            null,
+                                            null,
+                                            "expense_approver_id"
+                                          );
+                                          setDropDownData(
+                                            "employee_attendance_leaves",
+                                            x,
+                                            "expense_approver_id"
+                                          );
+                                        }}
+                                      >
+                                        {x.first_name + " " + x.last_name}
+                                      </Dropdown.Item>
+                                    )
+                                  )}
                                 </SimpleBar>
                               </Dropdown.Menu>
                             </Dropdown>
@@ -2185,11 +2310,17 @@ const EmployeeForm = () => {
                             >
                               Shift Request Approver
                             </Form.Label>
-                            <Dropdown onSelect={handleDropDownCreateNew}>
+                            <Dropdown>
                               <Dropdown.Toggle
                                 as="input"
                                 className="form-control rounded-end flag-input form-select"
                                 placeholder=""
+                                value={
+                                  selectedData?.shift_approver_id?.first_name
+                                }
+                                defaultValue={
+                                  selectedData?.shift_approver_id?.first_name
+                                }
                                 readOnly
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
@@ -2200,23 +2331,29 @@ const EmployeeForm = () => {
                                   style={{ maxHeight: "220px" }}
                                   className="px-3"
                                 >
-                                  <Dropdown.Item eventKey="abc">
-                                    Employee 1
-                                  </Dropdown.Item>
-                                  <Dropdown.Item eventKey="option2">
-                                    Employee 2
-                                  </Dropdown.Item>
-                                  <Dropdown.Divider></Dropdown.Divider>
-
-                                  <Dropdown.Item eventKey="user">
-                                    <div className="d-flex justify-content-center align-items-center text-primary">
-                                      <span
-                                        className="bx bx-plus-medical"
-                                        style={{ padding: 3 }}
-                                      ></span>
-                                      Create a new user
-                                    </div>
-                                  </Dropdown.Item>
+                                  {(employeeList || []).map(
+                                    (x: any, index: any) => (
+                                      <Dropdown.Item
+                                        key={index}
+                                        onClick={() => {
+                                          selectedSecondNameData(
+                                            "employee_attendance_leaves",
+                                            x.hrms_company_employee_id,
+                                            null,
+                                            null,
+                                            "shift_approver_id"
+                                          );
+                                          setDropDownData(
+                                            "employee_attendance_leaves",
+                                            x,
+                                            "shift_approver_id"
+                                          );
+                                        }}
+                                      >
+                                        {x.first_name + " " + x.last_name}
+                                      </Dropdown.Item>
+                                    )
+                                  )}
                                 </SimpleBar>
                               </Dropdown.Menu>
                             </Dropdown>
@@ -2228,11 +2365,17 @@ const EmployeeForm = () => {
                             >
                               Leave Approver
                             </Form.Label>
-                            <Dropdown onSelect={handleDropDownCreateNew}>
+                            <Dropdown>
                               <Dropdown.Toggle
                                 as="input"
                                 className="form-control rounded-end flag-input form-select"
-                                placeholder="Select Holiday List"
+                                placeholder=""
+                                value={
+                                  selectedData?.leave_approver_id?.first_name
+                                }
+                                defaultValue={
+                                  selectedData?.leave_approver_id?.first_name
+                                }
                                 readOnly
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
@@ -2243,29 +2386,35 @@ const EmployeeForm = () => {
                                   style={{ maxHeight: "220px" }}
                                   className="px-3"
                                 >
-                                  <Dropdown.Item eventKey="abc">
-                                    Employee 1
-                                  </Dropdown.Item>
-                                  <Dropdown.Item eventKey="option2">
-                                    Employee 2
-                                  </Dropdown.Item>
-                                  <Dropdown.Divider></Dropdown.Divider>
-
-                                  <Dropdown.Item eventKey="user">
-                                    <div className="d-flex justify-content-center align-items-center text-primary">
-                                      <span
-                                        className="bx bx-plus-medical"
-                                        style={{ padding: 3 }}
-                                      ></span>
-                                      Create a new user
-                                    </div>
-                                  </Dropdown.Item>
+                                  {(employeeList || []).map(
+                                    (x: any, index: any) => (
+                                      <Dropdown.Item
+                                        key={index}
+                                        onClick={() => {
+                                          selectedSecondNameData(
+                                            "employee_attendance_leaves",
+                                            x.hrms_company_employee_id,
+                                            null,
+                                            null,
+                                            "leave_approver_id"
+                                          );
+                                          setDropDownData(
+                                            "employee_attendance_leaves",
+                                            x,
+                                            "leave_approver_id"
+                                          );
+                                        }}
+                                      >
+                                        {x.first_name + " " + x.last_name}
+                                      </Dropdown.Item>
+                                    )
+                                  )}
                                 </SimpleBar>
                               </Dropdown.Menu>
                             </Dropdown>
                           </Col>
                         </Row>
-                      </Tab.Pane> */}
+                      </Tab.Pane>
 
                       {/* Salary Tab */}
                       <Tab.Pane eventKey="salary" id="salary">
@@ -2548,7 +2697,6 @@ const EmployeeForm = () => {
                                   {IMaritalStatus.map((x: any, index: any) => (
                                     <Dropdown.Item
                                       key={index}
-                                      name="marital_status"
                                       onClick={() => {
                                         selectedSecondNameData(
                                           "employee_personal",
@@ -2599,7 +2747,6 @@ const EmployeeForm = () => {
                                   {IBloodGroup.map((x: any, index: any) => (
                                     <Dropdown.Item
                                       key={index}
-                                      name="blood_group"
                                       onClick={() => {
                                         selectedSecondNameData(
                                           "employee_personal",
@@ -3369,7 +3516,6 @@ const EmployeeForm = () => {
                           onClick={() => {
                             setSelectedCompany(x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>
@@ -3460,7 +3606,6 @@ const EmployeeForm = () => {
                           onClick={() => {
                             setSelectedCompany(x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>
@@ -3605,7 +3750,6 @@ const EmployeeForm = () => {
                             onClick={() => {
                               inputEducationDetails("level", x, null);
                             }}
-                            name={"level" + index}
                           >
                             {x}
                           </Dropdown.Item>

@@ -56,8 +56,8 @@ const currency = ["INR", "USD", "EUR", "AUD", "CAD"];
 
 const CompanyForm = () => {
   const router = useRouter();
-  const { companyId } = router.query;
   const isMounted = useRef(false);
+  const { companyId } = router.query;
   const [selectedOption, setSelectedOption] = useState(null);
   const [validated, setValidated] = useState(false);
 
@@ -83,9 +83,8 @@ const CompanyForm = () => {
     {}
   );
 
-  const { company, isEditCompany } = useSelector((state: any) => ({
+  const { company } = useSelector((state: any) => ({
     company: state?.Company?.company,
-    isEditCompany: state?.Company?.isEdit,
   }));
 
   // Country Change States
@@ -110,53 +109,52 @@ const CompanyForm = () => {
   }, [company]);
 
   const setReducerData = () => {
-    if (companyId) {
-      getCompanyDetails(companyId);
-    }
-
-    setCompanyDetails(company);
-
-    console.log("reducer -->", company, isEditCompany);
-    setIsEdit(isEditCompany);
-    handleHolidayOptionClick(company?.holiday_list?.holiday_list_name);
-
-    if (company?.holiday_list) {
-      const name = "hrms_company_holiday_list_id";
-      setDataFromDropDown(
-        company?.holiday_list?.hrms_company_holiday_list_id,
-        name
-      );
-    }
-
-    if (company?.letter_head) {
-      setSelectedLetterHeadOption(company?.letter_head);
-      const name = "hrms_company_letter_head_id";
-      setDataFromDropDown(
-        company?.letter_head?.hrms_company_letter_head_id,
-        name
-      );
-    }
-    if (company.date_of_establishment) {
-      let value: any = new Date(company.date_of_establishment);
-      let name = "date_of_establishment";
-
-      setSelectedDate(value);
-
-      setCompanyDetails((data) => ({
-        ...data,
-        [name]: value,
-      }));
-    }
-
-    setCompanyDetails((data: any) => {
-      if (data.holiday_list || data.letter_head) {
-        delete data.holiday_list;
-        delete data.letter_head;
+    if (company) {
+      if (companyId) {
+        getCompanyDetails(companyId);
       }
-      return data;
-    });
 
-    console.log("reduces companyDetails --->", companyDetails);
+      setCompanyDetails(company);
+
+      setIsEdit(company.isEdit);
+      handleHolidayOptionClick(company?.holiday_list?.holiday_list_name);
+
+      if (company?.holiday_list) {
+        const name = "hrms_company_holiday_list_id";
+        setDataFromDropDown(
+          company?.holiday_list?.hrms_company_holiday_list_id,
+          name
+        );
+      }
+
+      if (company?.letter_head) {
+        setSelectedLetterHeadOption(company?.letter_head);
+        const name = "hrms_company_letter_head_id";
+        setDataFromDropDown(
+          company?.letter_head?.hrms_company_letter_head_id,
+          name
+        );
+      }
+      if (company?.date_of_establishment) {
+        let value: any = new Date(company?.date_of_establishment);
+        let name = "date_of_establishment";
+
+        setSelectedDate(value);
+
+        setCompanyDetails((data) => ({
+          ...data,
+          [name]: value,
+        }));
+      }
+
+      setCompanyDetails((data: any) => {
+        if (data.holiday_list || data.letter_head) {
+          delete data.holiday_list;
+          delete data.letter_head;
+        }
+        return data;
+      });
+    }
   };
 
   const getLetterHead = async () => {
@@ -228,10 +226,6 @@ const CompanyForm = () => {
     try {
       const bodyData = updateCompanyDetails(companyDetails);
 
-      // return;
-
-      console.log(bodyData);
-
       const result = await axiosInstance
         .post("setup/company/add_company", bodyData)
         .then((response: any) => {
@@ -283,7 +277,6 @@ const CompanyForm = () => {
 
   const setDataFromDropDown = (value: any, value_name: any) => {
     let name = value_name;
-    console.log(value);
 
     if (value_name == "date_of_establishment") {
       value = changeDateFormat(value);
@@ -305,9 +298,7 @@ const CompanyForm = () => {
       if (!data) return;
       await axiosInstance
         .get("setup/company/get_single_company/" + data)
-        .then((res: any) => {
-          console.log(res);
-        })
+        .then((res: any) => {})
         .catch((error) => {});
     } catch (error) {}
   };
@@ -337,7 +328,6 @@ const CompanyForm = () => {
       let bodyData = companyDetails;
 
       delete bodyData?.date_of_establishment;
-      console.log("update company", bodyData);
 
       try {
         const bodyData = updateCompanyDetails(companyDetails);
@@ -349,6 +339,7 @@ const CompanyForm = () => {
           .then((response: any) => {
             if (response.status === 200) {
               setCompanyDetails(initialState);
+              ToastSuccess(response.data.message);
               router.push("/pages/setup/company/companyList");
             }
           })
@@ -412,7 +403,6 @@ const CompanyForm = () => {
                       {(letterHeadData || []).map((letterHead: any, index) => (
                         <Dropdown.Item
                           key={index}
-                          name="group_id"
                           onClick={() =>
                             handleLetterHeadOptionClick(letterHead)
                           }
@@ -497,7 +487,6 @@ const CompanyForm = () => {
                       {currency.map((x: any, index) => (
                         <Dropdown.Item
                           key={index}
-                          name={"currency_" + index}
                           onClick={() => setDataFromDropDown(x, "currency")}
                         >
                           {x}
@@ -612,7 +601,6 @@ const CompanyForm = () => {
                       {holidatList.map((x: any, index) => (
                         <Dropdown.Item
                           key={index}
-                          name={"currency_" + index}
                           onClick={() => {
                             setDataFromDropDown(
                               x.id,
@@ -697,7 +685,7 @@ const CompanyForm = () => {
             {/* Divider */}
             <hr className="hr hr-blurry"></hr>
             <Button className="btn-sm" type="submit">
-              Submit
+              {isEdit ? "Update" : "Submit"}
             </Button>
           </Form>
         </Container>

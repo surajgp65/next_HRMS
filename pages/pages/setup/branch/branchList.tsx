@@ -110,7 +110,10 @@ const BranchList = () => {
         filterable: true,
         accessor: (cellProps: any) => {
           return (
-            <div onClick={() => openPopUp(cellProps)}>
+            <div
+              className="cursor-pointer"
+              onClick={() => openPopUp(cellProps)}
+            >
               <i className="ri-pencil-line"></i>
             </div>
           );
@@ -146,7 +149,6 @@ const BranchList = () => {
   };
 
   const openPopUp = (data: any) => {
-    console.log(data);
     setmodal_grid(true);
     setBranchData(data);
     setIsEdit(true);
@@ -157,7 +159,6 @@ const BranchList = () => {
     event.stopPropagation();
 
     const bodyData = branchData;
-    console.log(bodyData);
 
     try {
       await axiosInstance
@@ -173,7 +174,6 @@ const BranchList = () => {
               hrms_company_id: data.hrms_company_id,
             };
 
-            console.log(value);
             setBranchList((prev: any) =>
               prev.map((x: any) =>
                 x.hrms_company_branch_id === data.hrms_company_branch_id
@@ -238,7 +238,7 @@ const BranchList = () => {
                     className="custom-header-css table align-middle table-nowrap"
                     tableClassName="table-centered align-middle table-nowrap mb-0"
                     theadClassName="text-muted table-light"
-                    SearchPlaceholder="Search Designation..."
+                    SearchPlaceholder="Search Branch..."
                   />
                   <div className="noresult" style={{ display: "none" }}>
                     <div className="text-center">
@@ -311,7 +311,6 @@ const BranchList = () => {
                           onClick={() => {
                             selectCompanyData("hrms_company_id", x);
                           }}
-                          name={"hrms_company_id" + index}
                         >
                           {x.company_name}
                         </Dropdown.Item>

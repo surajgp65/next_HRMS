@@ -93,7 +93,6 @@ const CompensatoryForm = () => {
         .then((response: any) => {
           if (response.status == 200) {
             let data = response.data.data;
-            console.log(data);
             setCompanyList(data);
           }
         })
@@ -120,9 +119,6 @@ const CompensatoryForm = () => {
 
     try {
       let bodyData = keyNullManipulation(compLeaveData);
-
-      console.log(bodyData);
-      // return;
 
       await axiosInstance
         .post(
@@ -198,7 +194,6 @@ const CompensatoryForm = () => {
                                   );
                                   getLeaveType(x.hrms_company_id);
                                 }}
-                                name={"hrms_company_id" + index}
                               >
                                 {x.company_name}
                               </Dropdown.Item>
@@ -243,7 +238,6 @@ const CompensatoryForm = () => {
                                     x
                                   );
                                 }}
-                                name={"hrms_company_employee_id" + index}
                               >
                                 {x.first_name + " " + x.last_name}
                               </Dropdown.Item>
@@ -283,7 +277,6 @@ const CompensatoryForm = () => {
                               leaveTypeList.map((x: any, index: any) => (
                                 <Dropdown.Item
                                   key={index}
-                                  name={"hrms_company_leave_type_id" + index}
                                   onClick={() => {
                                     setAllData(
                                       "hrms_company_leave_type_id",

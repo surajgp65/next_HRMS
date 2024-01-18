@@ -28,6 +28,7 @@ import SimpleBar from "simplebar-react";
 import Flatpickr from "react-flatpickr";
 import axiosInstance from "lib/api";
 import { ToastSuccess } from "@common/toast";
+import { useSelector } from "react-redux";
 
 const initialState = {
   hrms_company_id: "",
@@ -65,9 +66,7 @@ const NewHoliday = () => {
   const [holidayData, setHolidayData] = useState(initialState);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [holidayGroupList, setholidayGroupList] = useState<any[]>([
-    holidayInitial,
-  ]);
+  const [holidayGroupList, setholidayGroupList] = useState<any[]>([]);
   const [newHoliday, setNewHoliday] = useState({});
 
   // Date
@@ -88,6 +87,38 @@ const NewHoliday = () => {
   ];
 
   useEffect(() => {}, [holidayData]);
+
+  useEffect(() => {
+    setReducerData();
+  }, []);
+
+  const { holiday } = useSelector((state: any) => ({
+    holiday: state?.Company?.holiday,
+  }));
+
+  const setReducerData = () => {
+    if (holiday) {
+      let holidaydata: any = holiday;
+
+      console.log(
+        "holidaydata -->",
+        holidaydata.from_date,
+        holidaydata.to_date
+      );
+      for (const key in holidaydata) {
+        if (typeof holidaydata[key] === "object" && holidaydata[key] !== null) {
+          if (holidaydata.list_data) {
+            setholidayGroupList(holidaydata[key]);
+          }
+        } else {
+          setHolidayData((prev: any) => ({
+            ...prev,
+            [key]: holidaydata[key],
+          }));
+        }
+      }
+    }
+  };
 
   const toggle = useCallback(() => {
     if (modalShow) {
@@ -117,26 +148,6 @@ const NewHoliday = () => {
     }
   };
 
-  //
-  const generateApiID = () => {
-    var d = new Date().getTime();
-
-    if (window.performance && typeof window.performance.now === "function") {
-      d += performance.now();
-    }
-
-    var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-      /[xy]/g,
-      function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
-      }
-    );
-
-    return uuid;
-  };
-
   // Validation Form
   const validation: any = useFormik({
     initialValues: {
@@ -154,26 +165,13 @@ const NewHoliday = () => {
 
       const bodyData = {
         description: values.description,
-        date: dateFormat(values.date),
+        date: changeDateFormat(values.date),
         holiday_list_name_id: holiday_list_name_id,
       };
       setholidayGroupList((prevData: any) => [...prevData, bodyData]);
       toggle();
     },
   });
-
-  const dateFormat = (inputDate: any) => {
-    // Convert the input date string to a Date object
-    const dateObject = new Date(inputDate);
-
-    const day = dateObject.getDate().toString().padStart(2, "0");
-    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // Note: Month is zero-based
-    const year = dateObject.getFullYear();
-
-    const formattedDate = `${day}-${month}-${year}`;
-
-    return formattedDate;
-  };
 
   // Functions
   const handleSubmit = (event: any) => {
@@ -184,27 +182,6 @@ const NewHoliday = () => {
     }
 
     setValidated(true);
-  };
-
-  const createApibutton = (e: any) => {
-    e.preventDefault();
-    let inputValue = (
-      document.getElementById("api-key-name") as HTMLInputElement
-    ).value;
-    setApiKeyName(inputValue);
-    if (inputValue) {
-      setsubmitBtn(true);
-      setIisGenerateAPIKey(generateApiID());
-    } else {
-      document.getElementById("api-key-error-msg")?.classList.remove("d-none");
-      document.getElementById("api-key-error-msg")?.classList.add("d-block");
-      setTimeout(() => {
-        document
-          .getElementById("api-key-error-msg")
-          ?.classList.remove("d-block");
-        document.getElementById("api-key-error-msg")?.classList.add("d-none");
-      }, 1000);
-    }
   };
 
   const columns = useMemo(
@@ -299,15 +276,17 @@ const NewHoliday = () => {
     []
   );
 
-  const setFromDateRange = (date: any, name: any) => {
-    date = changeDateFormat(date);
-    setFromDate(date);
-    setHolidayData((data) => ({ ...data, [name]: date }));
-  };
   const setToDateRange = (date: any, name: any) => {
     date = changeDateFormat(date);
     setToDate(date);
     setHolidayData((data) => ({ ...data, [name]: date }));
+  };
+
+  const setAllData = (name: any, value: any, date?: boolean) => {
+    if (date) {
+      value = changeDateFormat(date);
+    }
+    setHolidayData((data) => ({ ...data, [name]: value }));
   };
 
   const changeDateFormat = (date: any) => {
@@ -327,12 +306,10 @@ const NewHoliday = () => {
     const { name, value }: any = event.target;
 
     setHolidayData((data) => ({ ...data, [name]: value }));
-    console.log(holidayData);
   };
 
   const weekOffDropDown = (option: any) => {
     setHolidayData((data) => ({ ...data, weekly_off: option }));
-    console.log(holidayData);
   };
 
   const getHolidayListData = async () => {
@@ -373,27 +350,59 @@ const NewHoliday = () => {
         return x;
       });
 
-      console.log(holidayGroupList);
-      // return;
       await axiosInstance
         .post("/setup/company/add_new_holiday_list", holidayGroupList)
         .then((res: any) => {
           ToastSuccess(res.data.message);
+          router.push("/pages/setup/holidays/holidayList");
         })
         .catch((error) => {});
+    } catch (error) {}
+  };
+
+  const updateHoliday = async () => {
+    try {
+      let data = holidayGroupList.map((item: any) => {
+        const updatedItem = { ...item };
+        updatedItem.is_half_day = false;
+        updatedItem.start_time = null;
+        updatedItem.shift_end_time = null;
+
+        return updatedItem;
+      });
+      setholidayGroupList(data);
+      updateholidayData(data);
+    } catch (error) {}
+  };
+
+  const updateholidayData = async (listData: any) => {
+    try {
+      await axiosInstance
+        .put(
+          "/setup/company/update_holiday_list/" + holiday.holiday_list_name_id,
+          listData
+        )
+        .then((res: any) => {
+          if (res.status === 200) {
+            ToastSuccess(res.data.message);
+            router.push("/pages/setup/holidays/holidayList");
+          }
+        });
     } catch (error) {}
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>Add New Holiday</title>
+        <title>
+          {holiday.isEdit ? "Update Holiday list" : "Add New Holiday"}
+        </title>
       </Head>
       <div className="page-content">
         <Container fluid={true}>
           <Breadcrumb breadcrumb="Pages" breadcrumbItem="New Holiday List" />
 
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
+          <Form noValidate validated={validated}>
             <Row className="mb-3">
               <Form.Group as={Col} md="6" controlId="holiday_list_name">
                 <Form.Label>Holiday List Name</Form.Label>
@@ -403,6 +412,7 @@ const NewHoliday = () => {
                   placeholder="Holiday name..."
                   value={holidayData.holiday_list_name}
                   onChange={handelInputChange}
+                  disabled={holiday.isEdit}
                   required
                 />
                 <Form.Control.Feedback type="invalid">
@@ -431,13 +441,12 @@ const NewHoliday = () => {
                   name="from_date"
                   options={{
                     dateFormat: "d-m-Y",
-                    defaultDate: [currentDate],
-                    minDate: "today",
                   }}
-                  value={fromDate}
+                  value={holidayData.from_date}
                   onChange={(date: any) => {
-                    setFromDateRange(date[0], "from_date");
+                    setAllData("from_date", date[0], true);
                   }}
+                  disabled={holiday.isEdit}
                 />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid Date.
@@ -451,12 +460,12 @@ const NewHoliday = () => {
                   name="to_date"
                   options={{
                     dateFormat: "d-m-Y",
-                    minDate: "today",
                   }}
-                  value={toDate}
+                  value={holidayData.to_date}
                   onChange={(date: any) => {
-                    setToDateRange(date[0], "to_date");
+                    setAllData("to_date", date[0], true);
                   }}
+                  disabled={holiday.isEdit}
                 />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid Date.
@@ -477,6 +486,7 @@ const NewHoliday = () => {
                     value={holidayData.weekly_off}
                     name="weekly_off"
                     readOnly
+                    disabled={holiday.isEdit}
                   ></Dropdown.Toggle>
                   <Dropdown.Menu
                     as="ul"
@@ -486,7 +496,6 @@ const NewHoliday = () => {
                       {weekDays.map((item: any, index) => (
                         <Dropdown.Item
                           key={index}
-                          name="weekly_off"
                           onClick={() => weekOffDropDown(item)}
                         >
                           {item}
@@ -501,7 +510,11 @@ const NewHoliday = () => {
               </Form.Group>
             </Row>
             <br />
-            <Button className="btn-sm" onClick={getHolidayListData}>
+            <Button
+              className="btn-sm"
+              disabled={holiday.isEdit}
+              onClick={getHolidayListData}
+            >
               Add to holidays
             </Button>
 
@@ -557,10 +570,10 @@ const NewHoliday = () => {
                 <div className={styles.footerContent}>
                   <Button
                     variant="success"
-                    onClick={addNewHoliday}
+                    onClick={holiday.isEdit ? updateHoliday : addNewHoliday}
                     className="btn-sm mx-4"
                   >
-                    Submit
+                    {holiday.isEdit ? "Update" : "Submit"}
                   </Button>
                   <button type="button" className="btn btn-sm btn-light">
                     Reset
@@ -593,6 +606,7 @@ const NewHoliday = () => {
             validation.handleSubmit();
             return false;
           }}
+          autoComplete="off"
         >
           <Modal.Body>
             <div

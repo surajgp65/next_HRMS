@@ -121,8 +121,7 @@ const InvitePage = () => {
     // return;
     await axiosReqInstance
       .post("/user/invite_user/" + app_id, rqData)
-      .then((res: any) => {
-      });
+      .then((res: any) => {});
   };
 
   const handelInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,7 +253,6 @@ const InvitePage = () => {
                       {groupList.map((groupOption: any, index) => (
                         <Dropdown.Item
                           key={index}
-                          name="group_id"
                           onClick={() => handleGroupOptionClick(groupOption)}
                         >
                           {groupOption.group_name}
