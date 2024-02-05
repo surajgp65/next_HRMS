@@ -25,6 +25,7 @@ import CompanyReducer from "./company/reducer";
 import BranchReducer from "./branch/reducer";
 import LeaveReducer from "./leaves/reducer";
 import LeaveStructureReducer from "./leaveStructure/reducer";
+import EmployeeDetailReducer from "./employeeDetail/reducer"
 import AttendanceReducer from "./attendance/reducer";
 
 const combinedReducer = combineReducers({
@@ -38,6 +39,7 @@ const combinedReducer = combineReducers({
   Branch: BranchReducer,
   Leave: LeaveReducer,
   LeaveStructure: LeaveStructureReducer,
+  EmployeeDetail: EmployeeDetailReducer,
   Attendance: AttendanceReducer,
 });
 

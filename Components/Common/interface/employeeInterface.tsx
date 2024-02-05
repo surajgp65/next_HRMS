@@ -100,7 +100,7 @@ export const IPreferedContactEmail = [
 
 export const ICurrency = ["INR", "USD", "EUR", "AUD", "CAD"];
 export const ISalaryMode = ["bank", "cash", "cheque"];
-export const IMaritalStatus = ["Single", "Married", "Divorced", "Widowed"];
+export const IMaritalStatus = ["single", "married", "divorced", "widowed"];
 export const IBloodGroup = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 export const IEmpStatus = ["active", "inactive", "suspended", "left"];
 export const IPreferedEmail = ["company email", "personal email", "user id"];

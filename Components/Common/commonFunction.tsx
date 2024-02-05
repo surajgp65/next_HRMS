@@ -33,4 +33,27 @@ const keyNullManipulation = (data: any): any => {
   return updatedData;
 };
 
-export { changeDateFormat, keyNullManipulation };
+const replaceEmptyWithNull = (obj: any) => {
+  for (const key in obj) {
+    if (obj[key] === null) {
+      continue;
+    }
+
+    if (Array.isArray(obj[key]) && obj[key].length === 0) {
+      obj[key] = [];
+    } else if (typeof obj[key] === "object") {
+      obj[key] = JSON.parse(JSON.stringify(replaceEmptyWithNull(obj[key])));
+
+      // If the nested object is empty, set it to null
+      if (obj[key] && Object.keys(obj[key]).length === 0) {
+        obj[key] = null;
+      }
+    } else if (typeof obj[key] === "string" && obj[key].trim() === "") {
+      obj[key] = null;
+    }
+  }
+
+  return obj;
+};
+
+export { changeDateFormat, keyNullManipulation, replaceEmptyWithNull };

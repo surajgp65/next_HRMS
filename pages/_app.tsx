@@ -16,28 +16,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Spinner } from "react-bootstrap";
 
-// Import Firebase Configuration file
-// import { initFirebaseBackend } from "Components/helpers/firebase_helper";
+// React Query
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 
-// const firebaseConfig = {
-//   apiKey: process.env.NEXT_PUBLIC_APIKEY,
-//   authDomain: process.env.NEXT_PUBLIC_AUTHDOMAIN,
-//   databaseURL: process.env.NEXT_PUBLIC_DATABASEURL,
-//   projectId: process.env.NEXT_PUBLIC_PROJECTID,
-//   storageBucket: process.env.NEXT_PUBLIC_STORAGEBUCKET,
-//   messagingSenderId: process.env.NEXT_PUBLIC_MESSAGINGSENDERID,
-//   appId: process.env.NEXT_PUBLIC_APPID,
-//   measurementId: process.env.NEXT_PUBLIC_MEASUREMENTID,
-// };
-
-// // init firebase backend
-// initFirebaseBackend(firebaseConfig);
-
-// Fake backend
-// import fakeBackend from "Components/helpers/AuthType/fakeBackend";
-
-// Activating fake backend
-// fakeBackend();
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+const queryClient = new QueryClient();
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -56,31 +42,34 @@ const MyApp: NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = ({
 
   return (
     <>
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no"
-        />
-        <title>Hybrix | Next js & Admin Dashboard </title>
-      </Head>
-      <SSRProvider>
-        <Provider store={store}>
-          {getLayout(<Component {...pageProps} />)}
-          <ToastContainer />
-          <div className="">
-            <Spinner
-              id="showLoader"
-              animation="border"
-              className="position-fixed"
-              style={loaderStyle}
-              variant="primary"
-              role="status"
-            >
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </div>
-        </Provider>
-      </SSRProvider>
+      <QueryClientProvider client={queryClient}>
+        <Head>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+          />
+          <title>Hybrix | Next js & Admin Dashboard </title>
+        </Head>
+        <SSRProvider>
+          <Provider store={store}>
+            {getLayout(<Component {...pageProps} />)}
+            <ToastContainer />
+            <div className="">
+              <Spinner
+                id="showLoader"
+                animation="border"
+                className="position-fixed"
+                style={loaderStyle}
+                variant="primary"
+                role="status"
+              >
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+          </Provider>
+        </SSRProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </>
   );
 };

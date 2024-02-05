@@ -39,7 +39,12 @@ import {
 } from "@common/interface/employeeInterface";
 import axiosInstance from "lib/api";
 import { ToastSuccess } from "@common/toast";
-import { changeDateFormat, keyNullManipulation } from "@common/commonFunction";
+import {
+  changeDateFormat,
+  keyNullManipulation,
+  replaceEmptyWithNull,
+} from "@common/commonFunction";
+import { useSelector } from "react-redux";
 
 const initialSelected = {
   hrms_company_id: {},
@@ -214,6 +219,14 @@ const EmployeeForm = () => {
   const [holidayList, setHolidayList] = useState([]);
   const [shiftList, setShiftList] = useState<any[]>([]);
 
+  // data loaded state
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Get data from redux
+  const { updateEmployeeDetail } = useSelector((state: any) => ({
+    updateEmployeeDetail: state?.EmployeeDetail?.employeeDetail,
+  }));
+
   // Handle Input change
   const handleInputChange = (event: any) => {
     const { name, value } = event.target;
@@ -251,6 +264,7 @@ const EmployeeForm = () => {
         .then((res: any) => {
           if (res.status === 200) {
             ToastSuccess(res.data.message);
+            router.push("/pages/employee/employeeDetails/employeeList");
           }
         });
     } catch (error) {}
@@ -272,7 +286,6 @@ const EmployeeForm = () => {
     }
 
     if (s_name) {
-      console.log(value);
       setEmployeeData((prev: any) => ({
         ...prev,
         [name]: { ...prev[name], [s_name]: value },
@@ -293,7 +306,15 @@ const EmployeeForm = () => {
     };
     setEditor(true);
     getAllData();
+    if (updateEmployeeDetail) {
+      getAllEmployeeData(updateEmployeeDetail.hrms_company_employee_id);
+    }
   }, []);
+
+  useEffect(() => {
+    // console.log("Use effect --->", employeeData);
+    // console.log("Use effect --->", selectedData);
+  }, [selectedData]);
 
   const tog_grid = () => {
     setmodal_grid(!modal_grid);
@@ -304,9 +325,7 @@ const EmployeeForm = () => {
     if (selectedValue === "holiday") {
       router.push("/pages/setup/company/companyForm/newHoliday");
     } else if (selectedValue === "user") {
-      console.log(selectedValue);
     } else {
-      console.log(selectedValue);
     }
   };
 
@@ -520,6 +539,424 @@ const EmployeeForm = () => {
     []
   );
 
+  const getAllEmployeeData = async (id: string) => {
+    try {
+      await axiosInstance
+        .get("/employee/employeedetails/employee_overview/" + id)
+        .then((response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+console.log('oview data --->',data)
+            setObj(data, "employee_overview");
+
+            // setEmployeeData((prev: any) => ({ ...prev, ...data }));
+            setObjectData(data);
+            // employeeJoining(id);
+          }
+        })
+        .catch((error) => {});
+
+      // Employee Joining
+      await axiosInstance
+        .get("/employee/employeedetails/employee_joining/" + id)
+        .then((response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            // setEmployeeData((prev: any) => ({
+            //   ...prev,
+            //   employee_joining: data,
+            // }));
+            setObj(data, "employee_joining");
+
+            // setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      // Employee Address and Contact
+      await axiosInstance
+        .get("/employee/employeedetails/employee_address_contacts/" + id)
+        .then(async (response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            // setEmployeeData((prev: any) => ({
+            //   ...prev,
+            //   employee_address_contacts: data,
+            // }));
+            await setObj(data, "employee_address_contacts");
+            // await setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      // Employee Attendance and Leave
+      await axiosInstance
+        .get("/employee/employeedetails/employee_attendance/" + id)
+        .then(async (response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            // setEmployeeData((prev: any) => ({
+            //   ...prev,
+            //   employee_attendance_leaves: data,
+            // }));
+            await setObj(data, "employee_attendance_leaves");
+            // await setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      // Salary
+      await axiosInstance
+        .get("/employee/employeedetails/employee_salary/" + id)
+        .then(async (response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            // setEmployeeData((prev: any) => ({
+            //   ...prev,
+            //   employee_salary: data,
+            // }));
+            await setObj(data, "employee_salary");
+            await setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      // Personal
+      await axiosInstance
+        .get("/employee/employeedetails/employee_personal/" + id)
+        .then(async (response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+
+            // setEmployeeData((prev: any) => ({
+            //   ...prev,
+            //   employee_personal: data,
+            // }));
+            await setObj(data, "employee_personal");
+            // setObj2(data);
+            await setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      // Profile
+      await axiosInstance
+        .get("/employee/employeedetailsemployee_profile/" + id)
+        .then(async (response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            // setEmployeeData((prev: any) => ({
+            //   ...prev,
+            //   employee_profile: data,
+            // }));
+            await setObj(data, "employee_profile");
+            await setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      // Exit Tab
+      await axiosInstance
+        .get("/employee/employeedetails/employee_exit/" + id)
+        .then(async (response: any) => {
+          if (response.status == 200) {
+            let data = response.data.data;
+            // setEmployeeData((prev: any) => ({ ...prev, employee_exit: data }));
+            await setObj(data, "employee_exit");
+            setSelectedData(data);
+          }
+        })
+        .catch((error) => {});
+
+      setDataLoaded(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const setObjectData = async (data: any) => {
+    for (const key in data) {
+      if (typeof data[key] === "object") {
+        setSelectedData((prev: any) => ({
+          ...prev,
+          [key]: data[key],
+        }));
+      }
+    }
+
+
+    console.log('selectedData --->',selectedData)
+  };
+
+  // const setObj = async (data: any) => {
+  //   const updatedData = data;
+
+  //   for (const key in updatedData) {
+  //     if (typeof updatedData[key] === "object" && updatedData[key] !== null) {
+  //       setEmployeeData((prev: any) => ({
+  //         ...prev,
+  //         [key]: updatedData[key][key],
+  //       }));
+  //     } else {
+  //       if (updatedData[key] === "") {
+  //         setEmployeeData((prev: any) => ({
+  //           ...prev,
+  //           [key]: null,
+  //         }));
+  //       } else {
+  //         setEmployeeData((prev: any) => ({
+  //           ...prev,
+  //           [key]: updatedData[key],
+  //         }));
+  //       }
+  //     }
+  //   }
+  // };
+
+  const setObj = async (data: any, sectionKey?: string) => {
+    try {
+      switch (sectionKey) {
+        case "employee_overview":
+          const updatedData = data;
+          for (const key in data) {
+            if (
+              typeof updatedData[key] === "object" &&
+              updatedData[key] !== null
+            ) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [key]: data[key][key] ?? null,
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [key]: null,
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({ ...prev, [key]: data[key] }));
+            }
+          }
+          break;
+        case "employee_joining":
+          for (const key in data) {
+            if (
+              typeof data[sectionKey] === "object" &&
+              data[sectionKey] !== null
+            ) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key][key],
+                },
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: null,
+                },
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key],
+                },
+              }));
+            }
+          }
+          break;
+        case "employee_address_contacts":
+          for (const key in data) {
+            if (
+              typeof data[sectionKey] === "object" &&
+              data[sectionKey] !== null
+            ) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key][key],
+                },
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: null,
+                },
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key],
+                },
+              }));
+            }
+          }
+          break;
+        case "employee_attendance_leaves":
+          for (const key in data) {
+            if (typeof data[key] === "object" && data[key] !== null) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key][key],
+                },
+              }));
+              setSelectedData((prev: any) => ({
+                ...prev,
+                [key]: data[key],
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: null,
+                },
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key],
+                },
+              }));
+            }
+          }
+          break;
+        case "employee_salary":
+          for (const key in data) {
+            if (
+              typeof data[key] === "object" &&
+              data[key] !== null
+            ) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key][key],
+                },
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: null,
+                },
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key],
+                },
+              }));
+            }
+          }
+          break;
+        case "employee_personal":
+          for (const key in data) {
+            if (
+              typeof data[key] === "object" &&
+              data[key] !== null
+            ) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key][key],
+                },
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: null,
+                },
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key],
+                },
+              }));
+            }
+          }
+          break;
+        case "employee_profile":
+          for (const key in data) {
+            if (
+              typeof data[key] === "object" &&
+              data[key] !== null
+            ) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key][key],
+                },
+              }));
+            } else if (Array.isArray(data[key]) && data[key].length === 0) {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: [],
+                },
+              }));
+            } else if (data[key] === "") {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: null,
+                },
+              }));
+            } else {
+              setEmployeeData((prev: any) => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  [key]: data[key],
+                },
+              }));
+            }
+          }
+          break;
+        case "employee_exit":
+          if (
+            typeof data.employee_exit === "object" &&
+            data.employee_exit !== null
+          ) {
+            setEmployeeData((prev: any) => ({
+              ...prev,
+              employee_exit: { ...prev.employee_exit, ...data },
+            }));
+          }
+          break;
+        default:
+          console.warn("Unknown sectionKey:", sectionKey);
+      }
+    } catch (error) {
+      console.error("Error setting data:", error);
+    }
+  };
+
   const getAllData = async () => {
     try {
       await axiosInstance
@@ -708,6 +1145,28 @@ const EmployeeForm = () => {
     } catch (error) {}
   };
 
+  const updateEmployee = async (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      console.log("employeeData Update --->", employeeData);
+      let bodyData = replaceEmptyWithNull(employeeData);
+      console.log(bodyData);
+      await axiosInstance
+        .put(
+          "/employee/employeedetails/update_employee_overview/" +
+            updateEmployeeDetail.hrms_company_employee_id,
+          bodyData
+        )
+        .then((res: any) => {
+          if (res.status === 200) {
+            ToastSuccess(res.data.message);
+            router.push("/pages/employee/employeeDetails/employeeList");
+          }
+        });
+    } catch (error) {}
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -719,7 +1178,13 @@ const EmployeeForm = () => {
 
           {/* Form */}
 
-          <Form autoComplete="off" onSubmit={handleSubmit} className="row g-3">
+          <Form
+            autoComplete="off"
+            onSubmit={
+              updateEmployeeDetail.isEdit ? updateEmployee : handleSubmit
+            }
+            className="row g-3"
+          >
             <Col md={12}>
               <Card>
                 <Card.Body>
@@ -893,6 +1358,7 @@ const EmployeeForm = () => {
                               options={{
                                 dateFormat: "d-m-Y",
                               }}
+                              value={employeeData?.date_of_birth}
                               onChange={(date: any) => {
                                 selectedSecondNameData(
                                   "date_of_birth",
@@ -1074,6 +1540,7 @@ const EmployeeForm = () => {
                                 value={
                                   selectedData?.hrms_company_id?.company_name
                                 }
+                                defaultValue={selectedData?.hrms_company_id?.company_name}
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
                                 as="ul"
@@ -1553,10 +2020,12 @@ const EmployeeForm = () => {
                                       <Dropdown.Item
                                         key={index}
                                         onClick={() =>
-                                          selectDropdownData(
+                                          selectedSecondNameData(
                                             "employee_joining",
                                             x.hrms_company_employment_type_id,
-                                            x
+                                            x,
+                                            null,
+                                            "applicant_name"
                                           )
                                         }
                                       >
@@ -1593,6 +2062,10 @@ const EmployeeForm = () => {
                               options={{
                                 dateFormat: "d-m-Y",
                               }}
+                              value={
+                                employeeData?.employee_joining
+                                  ?.confirmation_date
+                              }
                               onChange={(date: any) => {
                                 selectedSecondNameData(
                                   "employee_joining",
@@ -1943,9 +2416,9 @@ const EmployeeForm = () => {
                                 readOnly
                               ></Dropdown.Toggle>
                               {/* value={
-                                  employeeData?.employee_address_contacts
-                                    ?.current_address
-                                } */}
+                                    employeeData?.employee_address_contacts
+                                      ?.current_address
+                                  } */}
                               <Dropdown.Menu
                                 as="ul"
                                 className="list-unstyled w-100 dropdown-menu-list mb-0"
@@ -2201,12 +2674,12 @@ const EmployeeForm = () => {
                                 className="form-control rounded-end flag-input form-select"
                                 placeholder=""
                                 value={
-                                  selectedData.hrms_company_shift_type_id
-                                    .shift_type_name
+                                  selectedData?.hrms_company_shift_type_id
+                                    ?.shift_type_name
                                 }
                                 defaultValue={
-                                  selectedData.hrms_company_shift_type_id
-                                    .shift_type_name
+                                  selectedData?.hrms_company_shift_type_id
+                                    ?.shift_type_name
                                 }
                               ></Dropdown.Toggle>
                               <Dropdown.Menu
@@ -3079,8 +3552,8 @@ const EmployeeForm = () => {
                                 <TableContainer
                                   columns={columns || []}
                                   data={
-                                    employeeData.employee_profile
-                                      .educational_qualifications || []
+                                    employeeData?.employee_profile
+                                      ?.educational_qualifications || []
                                   }
                                   isPagination={true}
                                   // isGlobalFilter={true}
@@ -3141,8 +3614,8 @@ const EmployeeForm = () => {
                                 <TableContainer
                                   columns={workExpColumns || []}
                                   data={
-                                    employeeData.employee_profile
-                                      .work_experiences || []
+                                    employeeData?.employee_profile
+                                      ?.history_in_company || []
                                   }
                                   isPagination={true}
                                   // isGlobalFilter={true}
@@ -3203,8 +3676,8 @@ const EmployeeForm = () => {
                                 <TableContainer
                                   columns={historyColumns || []}
                                   data={
-                                    employeeData.employee_profile
-                                      .history_in_company || []
+                                    employeeData?.employee_profile
+                                      ?.history_in_company || []
                                   }
                                   isPagination={true}
                                   // isGlobalFilter={true}
@@ -3473,7 +3946,7 @@ const EmployeeForm = () => {
 
             <Col className="col-12">
               <Button variant="primary" className="btn-sm" type="submit">
-                Submit form
+                {updateEmployeeDetail.isEdit ? "Update" : "Submit"}
               </Button>
             </Col>
           </Form>
