@@ -63,6 +63,7 @@ const initialSelected = {
   hrms_company_employee_reports_to_id: {},
   shift_approver_id: {},
   leave_approver_id: {},
+  hrms_company_employee_health_insurance_id:{},
 };
 
 const initialEmploymentType = {
@@ -238,7 +239,8 @@ const EmployeeForm = () => {
   };
 
   const inputEducationDetails = (name: any, value: any, data: any) => {
-    setEducationData((prev: any) => ({ ...prev, [name]: value }));
+    console.log('value --->',typeof value,value)
+    setEducationData((prev: any) => ({ ...prev, [name]: value,hrms_company_employee_id: updateEmployeeDetail.hrms_company_employee_id }));
   };
 
   const inputWorkExpDetails = (name: any, value: any, data: any) => {
@@ -279,7 +281,9 @@ const EmployeeForm = () => {
   ) => {
     if (type === "date") {
       value = changeDateFormat(value);
+      console.log('data --->',value)
     }
+
 
     if (data) {
       setSelectedData((prev: any) => ({ ...prev, [name]: data }));
@@ -293,6 +297,8 @@ const EmployeeForm = () => {
     } else {
       setEmployeeData((prev: any) => ({ ...prev, [name]: value }));
     }
+
+    console.log(data);
   };
 
   const setDropDownData = (name: any, data: any, s_name?: any) => {
@@ -312,9 +318,9 @@ const EmployeeForm = () => {
   }, []);
 
   useEffect(() => {
-    // console.log("Use effect --->", employeeData);
+    console.log("Use effect --->", employeeData);
     // console.log("Use effect --->", selectedData);
-  }, [selectedData]);
+  }, [employeeData]);
 
   const tog_grid = () => {
     setmodal_grid(!modal_grid);
@@ -347,14 +353,6 @@ const EmployeeForm = () => {
               />
             </div>
           );
-        },
-      },
-      {
-        Header: "ID",
-        disableFilters: true,
-        filterable: true,
-        accessor: (cellProps: any) => {
-          return cellProps.hrms_company_employee_id;
         },
       },
       {
@@ -423,19 +421,11 @@ const EmployeeForm = () => {
         },
       },
       {
-        Header: "No.",
-        disableFilters: true,
-        filterable: true,
-        accessor: (cellProps: any) => {
-          return cellProps.company;
-        },
-      },
-      {
         Header: "Company",
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.company;
+          return cellProps?.company;
         },
       },
       {
@@ -443,7 +433,7 @@ const EmployeeForm = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.designation;
+          return cellProps?.designation;
         },
       },
       {
@@ -451,7 +441,7 @@ const EmployeeForm = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.salary;
+          return cellProps?.salary;
         },
       },
       {
@@ -459,7 +449,7 @@ const EmployeeForm = () => {
         disableFilters: true,
         filterable: true,
         accessor: (cellProps: any) => {
-          return cellProps.address;
+          return cellProps?.address;
         },
       },
     ],
@@ -485,14 +475,6 @@ const EmployeeForm = () => {
               />
             </div>
           );
-        },
-      },
-      {
-        Header: "No.",
-        disableFilters: true,
-        filterable: true,
-        accessor: (cellProps: any) => {
-          return cellProps.branch;
         },
       },
       {
@@ -641,7 +623,7 @@ console.log('oview data --->',data)
 
       // Profile
       await axiosInstance
-        .get("/employee/employeedetailsemployee_profile/" + id)
+        .get("/employee/employeedetails/employee_profile/" + id)
         .then(async (response: any) => {
           if (response.status == 200) {
             let data = response.data.data;
@@ -661,7 +643,7 @@ console.log('oview data --->',data)
         .then(async (response: any) => {
           if (response.status == 200) {
             let data = response.data.data;
-            // setEmployeeData((prev: any) => ({ ...prev, employee_exit: data }));
+            console.log('employyee exit --->',data)
             await setObj(data, "employee_exit");
             setSelectedData(data);
           }
@@ -671,6 +653,8 @@ console.log('oview data --->',data)
       setDataLoaded(true);
     } catch (error) {
       console.log(error);
+    }finally{
+      console.log('employee data all --->',employeeData)
     }
   };
 
@@ -899,6 +883,102 @@ console.log('oview data --->',data)
           }
           break;
         case "employee_profile":
+          console.log('employee_profile --->',data);
+          // for (const key in data) {
+          //   if (
+          //     typeof data[key] === "object" &&
+          //     data[key] !== null
+          //   ) {
+          //     setEmployeeData((prev: any) => ({
+          //       ...prev,
+          //       [sectionKey]: {
+          //         ...prev[sectionKey],
+          //         [key]: data[key][key],
+          //       },
+          //     }));
+          //   } else if (Array.isArray(data[key]) && data[key].length === 0) {
+          //     setEmployeeData((prev: any) => ({
+          //       ...prev,
+          //       [sectionKey]: {
+          //         ...prev[sectionKey],
+          //         [key]: [],
+          //       },
+          //     }));
+          //   } else if (data[key] === "") {
+          //     setEmployeeData((prev: any) => ({
+          //       ...prev,
+          //       [sectionKey]: {
+          //         ...prev[sectionKey],
+          //         [key]: null,
+          //       },
+          //     }));
+          //   } else {
+          //     setEmployeeData((prev: any) => ({
+          //       ...prev,
+          //       [sectionKey]: {
+          //         ...prev[sectionKey],
+          //         [key]: data[key],
+          //       },
+          //     }));
+          //   }
+          // }
+
+          for (const key in data) {
+            if (Array.isArray(data[key])) {
+                // Check if it's an empty array
+                if (data[key].length === 0) {
+                    setEmployeeData((prev: any) => ({
+                        ...prev,
+                        [sectionKey]: {
+                            ...prev[sectionKey],
+                            [key]: [],
+                        },
+                    }));
+                } else {
+                    // If it's a non-empty array, simply set the value
+                    setEmployeeData((prev: any) => ({
+                        ...prev,
+                        [sectionKey]: {
+                            ...prev[sectionKey],
+                            [key]: data[key],
+                        },
+                    }));
+                }
+            } else if (
+                typeof data[key] === "object" &&
+                data[key] !== null
+            ) {
+                // For objects, set the value recursively
+                setEmployeeData((prev: any) => ({
+                    ...prev,
+                    [sectionKey]: {
+                        ...prev[sectionKey],
+                        [key]: data[key],
+                    },
+                }));
+            } else if (data[key] === "") {
+                // Handle empty strings
+                setEmployeeData((prev: any) => ({
+                    ...prev,
+                    [sectionKey]: {
+                        ...prev[sectionKey],
+                        [key]: null,
+                    },
+                }));
+            } else {
+                // For other types (strings, numbers, etc.), simply set the value
+                setEmployeeData((prev: any) => ({
+                    ...prev,
+                    [sectionKey]: {
+                        ...prev[sectionKey],
+                        [key]: data[key],
+                    },
+                }));
+            }
+        }
+        
+          break;
+        case "employee_exit":
           for (const key in data) {
             if (
               typeof data[key] === "object" &&
@@ -936,17 +1016,6 @@ console.log('oview data --->',data)
                 },
               }));
             }
-          }
-          break;
-        case "employee_exit":
-          if (
-            typeof data.employee_exit === "object" &&
-            data.employee_exit !== null
-          ) {
-            setEmployeeData((prev: any) => ({
-              ...prev,
-              employee_exit: { ...prev.employee_exit, ...data },
-            }));
           }
           break;
         default:
@@ -1107,11 +1176,16 @@ console.log('oview data --->',data)
     let value: any;
     if (s_name === "educational_qualifications") {
       value = keyNullManipulation(educationData);
+
+      console.log('valueeee --->',value)
     } else if (s_name === "work_experiences") {
+
+      console.log('work exp --->',name,s_name )
       value = keyNullManipulation(workExperienceData);
     } else if (s_name === "history_in_company") {
       value = keyNullManipulation(companyHistoryData);
     }
+
 
     setEmployeeData((prev: any) => {
       const existingArray = prev[name][s_name] || [];
@@ -1149,9 +1223,12 @@ console.log('oview data --->',data)
     event.preventDefault();
     event.stopPropagation();
     try {
-      console.log("employeeData Update --->", employeeData);
+      console.log("employeeData Update --___->", employeeData);
       let bodyData = replaceEmptyWithNull(employeeData);
-      console.log(bodyData);
+      console.log( 'employeeData Update  -->',  bodyData);
+
+
+      
       await axiosInstance
         .put(
           "/employee/employeedetails/update_employee_overview/" +
@@ -2642,7 +2719,7 @@ console.log('oview data --->',data)
                                       onClick={() => {
                                         selectedSecondNameData(
                                           "employee_attendance_leaves",
-                                          x.id,
+                                          x.holiday_list_name_id,
                                           x,
                                           null,
                                           "hrms_company_holiday_name_id"
@@ -3317,11 +3394,11 @@ console.log('oview data --->',data)
                                 className="form-control rounded-end flag-input form-select"
                                 placeholder=""
                                 value={
-                                  selectedData?.employee_personal
+                                  selectedData?.hrms_company_employee_health_insurance_id
                                     ?.health_insurance_name
                                 }
                                 defaultValue={
-                                  selectedData?.employee_personal
+                                  selectedData?.hrms_company_employee_health_insurance_id
                                     ?.health_insurance_name
                                 }
                                 readOnly
@@ -3615,7 +3692,7 @@ console.log('oview data --->',data)
                                   columns={workExpColumns || []}
                                   data={
                                     employeeData?.employee_profile
-                                      ?.history_in_company || []
+                                      ?.work_experiences || []
                                   }
                                   isPagination={true}
                                   // isGlobalFilter={true}
@@ -3723,7 +3800,6 @@ console.log('oview data --->',data)
                               className="form-control"
                               options={{
                                 dateFormat: "d-m-Y",
-                                minDate: "today",
                               }}
                               id="resignation_letter_date"
                               name="resignation_letter_date"

@@ -93,6 +93,13 @@ const Dashboard = () => {
                 <i className="mdi mdi-check-bold align-middle lh-1 me-2"></i>
                 Employee Grade
               </ListGroup.Item>
+              <ListGroup.Item
+                className={styles.dashBoard_list}
+                onClick={() => gotoEmployee("job_applicant/jobApplicantList")}
+              >
+                <i className="mdi mdi-check-bold align-middle lh-1 me-2"></i>
+                Job Applicant
+              </ListGroup.Item>
             </ListGroup>
           </Col>
           <Col md="3">
